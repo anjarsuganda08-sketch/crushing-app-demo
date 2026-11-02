@@ -1,0 +1,1139 @@
+<!DOCTYPE html>
+<html lang="id">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <title>
+        Detail Ticket Produksi
+    </title>
+
+    <link
+        rel="stylesheet"
+        href="{{ url_for(
+            'static',
+            filename='css/style.css'
+        ) }}"
+    >
+
+    <style>
+
+        .ticket-success-overlay {
+            position:fixed; inset:0; z-index:99999; display:grid; place-items:center;
+            background:rgba(15,23,42,.22); backdrop-filter:blur(4px);
+            animation:successOverlayIn .18s ease-out;
+        }
+        .ticket-success-card {
+            width:min(360px, calc(100% - 32px)); padding:28px 24px; text-align:center;
+            background:#fff; border:1px solid #dbe5f1; border-radius:22px;
+            box-shadow:0 24px 60px rgba(15,23,42,.20); animation:successCardIn .38s cubic-bezier(.2,.8,.2,1);
+        }
+        .ticket-success-check {
+            width:68px; height:68px; margin:0 auto 14px; display:grid; place-items:center;
+            border-radius:50%; background:#dcfce7; color:#15803d; font-size:38px; font-weight:900;
+            box-shadow:0 0 0 9px #f0fdf4; animation:successCheckPop .48s cubic-bezier(.2,.9,.2,1);
+        }
+        .ticket-success-title { color:#172033; font-size:20px; font-weight:900; }
+        .ticket-success-text { margin-top:5px; color:#64748b; font-size:13px; }
+        .ticket-success-overlay.ticket-success-hide { opacity:0; transition:opacity .25s ease; pointer-events:none; }
+        .ticket-success-overlay.ticket-success-hide .ticket-success-card { transform:translateY(-8px) scale(.97); opacity:0; transition:transform .25s ease, opacity .25s ease; }
+        @keyframes successOverlayIn { from{opacity:0} to{opacity:1} }
+        @keyframes successCardIn { from{opacity:0; transform:translateY(16px) scale(.94)} to{opacity:1; transform:translateY(0) scale(1)} }
+        @keyframes successCheckPop { 0%{transform:scale(.4); opacity:0} 70%{transform:scale(1.08)} 100%{transform:scale(1); opacity:1} }
+
+        /* ==================================================
+           MARIS INFORMATION
+        ================================================== */
+
+        .maris-box {
+
+            margin-top:20px;
+
+            padding:18px;
+
+            border-radius:10px;
+
+            background:#f8fafc;
+
+            border:1px solid #e2e8f0;
+
+        }
+
+
+        .maris-title {
+
+            font-size:18px;
+
+            font-weight:bold;
+
+            margin-bottom:15px;
+
+        }
+
+
+        .maris-grid {
+
+            display:grid;
+
+            grid-template-columns:
+                repeat(
+                    auto-fit,
+                    minmax(180px, 1fr)
+                );
+
+            gap:12px;
+
+        }
+
+
+        .maris-item {
+
+            background:white;
+
+            border-radius:8px;
+
+            padding:12px;
+
+            border:1px solid #e5e7eb;
+
+        }
+
+
+        .maris-item span {
+
+            display:block;
+
+            font-size:12px;
+
+            color:#6b7280;
+
+            margin-bottom:5px;
+
+        }
+
+
+        .maris-item strong {
+
+            display:block;
+
+            font-size:15px;
+
+            color:#111827;
+
+        }
+
+
+        .maris-waiting {
+
+            color:#b45309 !important;
+
+        }
+
+
+        .maris-completed {
+
+            color:#15803d !important;
+
+        }
+
+
+        /* ==================================================
+           REMARK
+        ================================================== */
+
+        .remark-box {
+
+            margin-top:20px;
+
+            padding:15px;
+
+            background:#f3f4f6;
+
+            border-radius:10px;
+
+            border-left:
+                5px solid #2563eb;
+
+        }
+
+
+        .remark-label {
+
+            font-size:12px;
+
+            color:#6b7280;
+
+            margin-bottom:5px;
+
+        }
+
+
+        .remark-value {
+
+            font-size:17px;
+
+            font-weight:bold;
+
+            color:#111827;
+
+        }
+
+
+        /* ==================================================
+           DETAIL TABLE
+        ================================================== */
+
+        .transaction-wrapper {
+
+            overflow-x:auto;
+
+        }
+
+
+        .transaction-table {
+
+            width:100%;
+
+            border-collapse:collapse;
+
+        }
+
+
+        .transaction-table th,
+        .transaction-table td {
+
+            border:1px solid #ddd;
+
+            padding:10px;
+
+            text-align:left;
+
+        }
+
+
+        .transaction-table th {
+
+            background:#f3f4f6;
+
+        }
+
+
+        .transaction-table .number {
+
+            text-align:center;
+
+        }
+
+
+        .transaction-table .qty {
+
+            text-align:center;
+
+            font-weight:bold;
+
+        }
+
+
+        .transaction-table .price {
+
+            text-align:right;
+
+        }
+
+
+        .transaction-table .total {
+
+            text-align:right;
+
+        }
+
+
+        .total-row {
+
+            background:#f9fafb;
+
+            font-weight:bold;
+
+        }
+
+
+        /* ==================================================
+           STATUS BADGE
+        ================================================== */
+
+        .status-badge {
+
+            display:inline-block;
+
+            padding:6px 11px;
+
+            border-radius:20px;
+
+            font-size:12px;
+
+            font-weight:bold;
+
+        }
+
+
+        .status-pending {
+
+            background:#fef3c7;
+
+            color:#92400e;
+
+        }
+
+
+        .status-approved {
+
+            background:#dbeafe;
+
+            color:#1d4ed8;
+
+        }
+
+
+        .status-maris {
+
+            background:#dcfce7;
+
+            color:#166534;
+
+        }
+
+
+        /* ==================================================
+           HISTORY
+        ================================================== */
+
+        .history-wrapper {
+
+            overflow-x:auto;
+
+        }
+
+
+        .history-table {
+
+            width:100%;
+
+            border-collapse:collapse;
+
+        }
+
+
+        .history-table th,
+        .history-table td {
+
+            padding:10px;
+
+            border:1px solid #ddd;
+
+        }
+
+
+        .history-table th {
+
+            background:#f3f4f6;
+
+        }
+
+
+        /* ==================================================
+           RESPONSIVE
+        ================================================== */
+
+        @media (
+            max-width:700px
+        ) {
+
+            .transaction-table {
+
+                min-width:750px;
+
+            }
+
+            .history-table {
+
+                min-width:600px;
+
+            }
+
+        }
+
+    </style>
+
+</head>
+
+
+<body class="page-production">
+
+{% include '_app_nav.html' %}
+
+{% if request.args.get("created") == "1" %}
+<div id="ticketSuccessOverlay" class="ticket-success-overlay" aria-live="polite">
+    <div class="ticket-success-card">
+        <div class="ticket-success-check">✓</div>
+        <div class="ticket-success-title">Transaksi Berhasil</div>
+        <div class="ticket-success-text">Crushing Ticket berhasil dibuat.</div>
+    </div>
+</div>
+{% endif %}
+
+
+
+<div class="production-shell">
+
+<div class="production-card">
+
+
+    <!-- ================================================= -->
+    <!-- HEADER -->
+    <!-- ================================================= -->
+
+    <div class="production-header">
+
+        <div>
+
+            <p class="eyebrow">
+                Crushing App
+            </p>
+
+            <h1>
+                Detail Crushing Ticket
+            </h1>
+
+        </div>
+
+
+        <div class="badge">
+
+            Operator Produksi
+
+        </div>
+
+    </div>
+
+
+    <!-- ================================================= -->
+    <!-- INFORMASI TICKET
+    ================================================= -->
+
+    <div class="ticket-info-grid">
+
+
+        <div class="info-box">
+
+            <span>
+                No Ticket
+            </span>
+
+            <h3>
+                {{ ticket.ticket_number }}
+            </h3>
+
+        </div>
+
+
+        <div class="info-box">
+
+            <span>
+                Line
+            </span>
+
+            <h3>
+                {{ ticket.line }}
+            </h3>
+
+        </div>
+
+
+        <div class="info-box">
+
+            <span>
+                Shift
+            </span>
+
+            <h3>
+                {{ ticket.shift }}
+            </h3>
+
+        </div>
+
+
+        <div class="info-box">
+
+            <span>
+                Status
+            </span>
+
+
+            <h3>
+
+                {% if ticket.status == "MARIS Completed" %}
+
+                    <span
+                        class="status-badge status-maris"
+                    >
+                        MARIS Completed
+                    </span>
+
+                {% elif ticket.status == "Approved" %}
+
+                    <span
+                        class="status-badge status-approved"
+                    >
+                        Approved
+                    </span>
+
+                {% else %}
+
+                    <span
+                        class="status-badge status-pending"
+                    >
+                        {{ ticket.status }}
+                    </span>
+
+                {% endif %}
+
+            </h3>
+
+        </div>
+
+
+    </div>
+
+
+    <!-- ================================================= -->
+    <!-- REMARK / KLASIFIKASI NG
+    ================================================= -->
+
+    <div class="remark-box">
+
+        <div class="remark-label">
+
+            Klasifikasi NG / Remark
+
+        </div>
+
+
+        <div class="remark-value">
+
+            {{ ticket.remarks or "-" }}
+
+        </div>
+
+    </div>
+
+
+    <!-- ================================================= -->
+    <!-- INFORMASI MARIS
+    ================================================= -->
+
+    <div class="maris-box">
+
+        <div class="maris-title">
+
+            Informasi Transaksi MARIS
+
+        </div>
+
+
+        <div class="maris-grid">
+
+
+            <!-- STATUS MARIS -->
+
+            <div class="maris-item">
+
+                <span>
+                    Status MARIS
+                </span>
+
+
+                {% if ticket.maris_transaction_number %}
+
+                    <strong
+                        class="maris-completed"
+                    >
+                        MARIS Completed
+                    </strong>
+
+                {% else %}
+
+                    <strong
+                        class="maris-waiting"
+                    >
+                        Menunggu Input MARIS
+                    </strong>
+
+                {% endif %}
+
+            </div>
+
+
+            <!-- NOMOR TRANSAKSI -->
+
+            <div class="maris-item">
+
+                <span>
+                    Nomor Transaksi MARIS
+                </span>
+
+
+                <strong>
+
+                    {{ ticket.maris_transaction_number or "-" }}
+
+                </strong>
+
+            </div>
+
+
+            <!-- INPUT OLEH -->
+
+            <div class="maris-item">
+
+                <span>
+                    Input MARIS Oleh
+                </span>
+
+
+                <strong>
+
+                    {{ ticket.maris_input_by or "-" }}
+
+                </strong>
+
+            </div>
+
+
+            <!-- WAKTU INPUT -->
+
+            <div class="maris-item">
+
+                <span>
+                    Waktu Input MARIS
+                </span>
+
+
+                <strong>
+
+                    {% if ticket.maris_input_at %}
+
+                        {{
+                            ticket.maris_input_at.strftime(
+                                "%d-%m-%Y %H:%M"
+                            )
+                        }}
+
+                    {% else %}
+
+                        -
+
+                    {% endif %}
+
+                </strong>
+
+            </div>
+
+
+        </div>
+
+    </div>
+
+
+    <br>
+
+
+    <!-- ================================================= -->
+    <!-- DETAIL TRANSAKSI
+    ================================================= -->
+
+    <h2
+        style="
+            margin-bottom:20px;
+        "
+    >
+
+        Detail Transaksi
+
+    </h2>
+
+
+    <div class="transaction-wrapper">
+
+        <table
+            class="transaction-table"
+        >
+
+            <thead>
+
+                <tr>
+
+                    <th>
+                        No
+                    </th>
+
+                    <th>
+                        Model
+                    </th>
+
+                    <th>
+                        Part Name
+                    </th>
+
+                    <th>
+                        Part Number
+                    </th>
+
+                    <th>
+                        Jenis NG
+                    </th>
+
+                    <th>
+                        Qty
+                    </th>
+
+                    <th>
+                        Harga
+                    </th>
+
+                    <th>
+                        Total
+                    </th>
+
+                </tr>
+
+            </thead>
+
+
+            <tbody>
+
+
+            {% for item in items %}
+
+                <tr>
+
+                    <td class="number">
+
+                        {{ loop.index }}
+
+                    </td>
+
+
+                    <td>
+
+                        {{ item.model }}
+
+                    </td>
+
+
+                    <td>
+
+                        {{ item.part_name }}
+
+                    </td>
+
+
+                    <td>
+
+                        {{ item.part_number }}
+
+                    </td>
+
+
+                    <td>
+
+                        {{ item.jenis_ng or "-" }}
+
+                    </td>
+
+
+                    <td class="qty">
+
+                        {{ item.quantity }}
+
+                    </td>
+
+
+                    <td class="price">
+
+                        Rp
+                        {{
+                            "{:,.0f}".format(
+                                item.price or 0
+                            ).replace(
+                                ",",
+                                "."
+                            )
+                        }}
+
+                    </td>
+
+
+                    <td class="total">
+
+                        Rp
+                        {{
+                            "{:,.0f}".format(
+                                (
+                                    item.price or 0
+                                )
+                                *
+                                (
+                                    item.quantity or 0
+                                )
+                            ).replace(
+                                ",",
+                                "."
+                            )
+                        }}
+
+                    </td>
+
+                </tr>
+
+            {% endfor %}
+
+
+            {% if items|length == 0 %}
+
+                <tr>
+
+                    <td
+                        colspan="8"
+                        style="
+                            text-align:center;
+                            padding:20px;
+                        "
+                    >
+
+                        Tidak ada transaksi part.
+
+                    </td>
+
+                </tr>
+
+            {% endif %}
+
+
+            <!-- ================================================= -->
+            <!-- TOTAL
+            ================================================= -->
+
+            {% if items|length > 0 %}
+
+            <tr class="total-row">
+
+                <td
+                    colspan="5"
+                    style="text-align:right;"
+                >
+
+                    TOTAL
+
+                </td>
+
+
+                <td class="qty">
+
+                    {{ total_quantity }}
+
+                </td>
+
+
+                <td>
+
+                    -
+
+                </td>
+
+
+                <td class="total">
+
+                    Rp
+                    {{
+                        "{:,.0f}".format(
+                            total_value
+                        ).replace(
+                            ",",
+                            "."
+                        )
+                    }}
+
+                </td>
+
+            </tr>
+
+            {% endif %}
+
+
+            </tbody>
+
+        </table>
+
+    </div>
+
+
+    <br>
+
+
+    <!-- ================================================= -->
+    <!-- WAKTU PEMBUATAN
+    ================================================= -->
+
+    <div
+        style="
+            color:#6b7280;
+            font-size:13px;
+        "
+    >
+
+        Ticket dibuat:
+
+        {% if ticket.created_at %}
+
+            {{
+                ticket.created_at.strftime(
+                    "%d-%m-%Y %H:%M"
+                )
+            }}
+
+        {% else %}
+
+            -
+
+        {% endif %}
+
+    </div>
+
+
+    <!-- ================================================= -->
+    <!-- APPROVAL INFO
+    ================================================= -->
+
+    {% if ticket.approved_at %}
+
+    <div
+        style="
+            margin-top:6px;
+            color:#6b7280;
+            font-size:13px;
+        "
+    >
+
+        Approved:
+
+        {{
+            ticket.approved_at.strftime(
+                "%d-%m-%Y %H:%M"
+            )
+        }}
+
+
+        {% if ticket.approved_by %}
+
+            oleh
+            <strong>
+                {{ ticket.approved_by }}
+            </strong>
+
+        {% endif %}
+
+    </div>
+
+    {% endif %}
+
+
+    <br><br>
+
+
+    <!-- ================================================= -->
+    <!-- HISTORY LINE
+    ================================================= -->
+
+    <h2
+        style="
+            margin-bottom:20px;
+        "
+    >
+
+        Histori Ticket Line {{ ticket.line }}
+
+    </h2>
+
+
+    {% if histories %}
+
+    <div class="history-wrapper">
+
+        <table class="history-table">
+
+            <thead>
+
+                <tr>
+
+                    <th>
+                        No Ticket
+                    </th>
+
+                    <th>
+                        Shift
+                    </th>
+
+                    <th>
+                        Status
+                    </th>
+
+                    <th>
+                        Tanggal
+                    </th>
+
+                    <th>
+                        Nomor MARIS
+                    </th>
+
+                </tr>
+
+            </thead>
+
+
+            <tbody>
+
+
+            {% for h in histories %}
+
+                <tr>
+
+                    <td>
+                        {{ h.ticket_number }}
+                    </td>
+
+                    <td>
+                        {{ h.shift }}
+                    </td>
+
+                    <td>
+                        {{ h.status }}
+                    </td>
+
+                    <td>
+
+                        {% if h.created_at %}
+
+                            {{
+                                h.created_at.strftime(
+                                    "%d-%m-%Y %H:%M"
+                                )
+                            }}
+
+                        {% else %}
+
+                            -
+
+                        {% endif %}
+
+                    </td>
+
+                    <td>
+
+                        {{ h.maris_transaction_number or "-" }}
+
+                    </td>
+
+                </tr>
+
+            {% endfor %}
+
+
+            </tbody>
+
+        </table>
+
+    </div>
+
+
+    {% else %}
+
+        <p>
+            Belum ada histori ticket.
+        </p>
+
+    {% endif %}
+
+
+    <br><br>
+
+
+    <!-- ================================================= -->
+    <!-- ACTION
+    ================================================= -->
+
+    <div
+        style="
+            display:flex;
+            gap:15px;
+            flex-wrap:wrap;
+        "
+    >
+
+        <a
+            href="{{ url_for(
+                'production.production'
+            ) }}"
+            class="open-btn"
+        >
+
+            Tambah Transaksi Baru
+
+        </a>
+
+    </div>
+
+
+</div>
+
+</div>
+
+{% if request.args.get("created") == "1" %}
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+    const overlay = document.getElementById("ticketSuccessOverlay");
+    if (!overlay) return;
+
+    function closeSuccessPopup() {
+        if (overlay.dataset.closed === "1") return;
+        overlay.dataset.closed = "1";
+        overlay.classList.add("ticket-success-hide");
+        setTimeout(function () {
+            if (overlay.parentNode) overlay.parentNode.removeChild(overlay);
+        }, 260);
+    }
+
+    setTimeout(closeSuccessPopup, 1800);
+    overlay.addEventListener("click", closeSuccessPopup);
+    document.addEventListener("keydown", function (event) {
+        if (event.key === "Escape") closeSuccessPopup();
+    });
+});
+</script>
+{% endif %}
+
+
+
+<footer class="app-footer">
+    <strong>Crushing App by: Anjar S</strong>
+    <span>NG Material Control · © 2026</span>
+</footer>
+
+</body>
+
+</html>

@@ -1,0 +1,2265 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Production — Crushing App</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+
+<body
+    class="page-production production-page"
+    data-can-upload-photo="{{ 'true' if (is_admin or is_maris) else 'false' }}"
+>
+
+{% include '_app_nav.html' %}
+
+<div class="production-shell">
+
+    <div class="production-card production-card-modern">
+
+        <!-- ==========================================================
+             HEADER
+        =========================================================== -->
+
+        <div class="production-header">
+
+            <div>
+
+                <p class="eyebrow">
+                    CRUSHING APP • PRODUCTION
+                </p>
+
+                <h1>
+                    Input Crushing Ticket
+                </h1>
+
+                <p class="page-subtitle">
+                    Pilih satu atau beberapa part dalam satu ticket.
+                    Qty dapat diatur setelah part dipilih.
+                </p>
+
+            </div>
+
+            <div class="ticket-live-badge">
+                <span></span>
+                Ticket Aktif
+            </div>
+
+        </div>
+
+
+        <!-- ==========================================================
+             ERROR MESSAGE
+        =========================================================== -->
+
+        {% if error_message %}
+
+        <div class="alert alert-error">
+
+            <strong>⚠ Perhatian</strong>
+
+            <span>
+                {{ error_message }}
+            </span>
+
+        </div>
+
+        {% endif %}
+
+
+        <!-- ==========================================================
+             PRODUCTION FORM
+        =========================================================== -->
+
+        <form
+            method="POST"
+            id="partForm"
+            novalidate
+        >
+
+            <input
+                type="hidden"
+                name="action"
+                value="save_part"
+            >
+
+
+            <!-- ======================================================
+                 CLASSIFICATION + LINE + MODEL
+            ======================================================= -->
+
+            <div class="production-form-grid">
+
+
+                <!-- KLASIFIKASI NG -->
+
+                <div class="field field-wide">
+
+                    <label for="remarks">
+                        Klasifikasi NG / Remark
+                    </label>
+
+                    <select
+                        id="remarks"
+                        name="remarks"
+                        {% if current_remarks %}disabled{% endif %}
+                        required
+                    >
+
+                        <option value="">
+                            Pilih Klasifikasi NG
+                        </option>
+
+
+                        {% for classification in ng_classifications %}
+
+                        <option
+                            value="{{ classification.name }}"
+                            {% if current_remarks == classification.name %}selected{% endif %}
+                        >
+
+                            {% if classification.name == 'Process' %}
+                                Reguler
+                            {% else %}
+                                {{ classification.name }}
+                            {% endif %}
+
+                        </option>
+
+                        {% endfor %}
+
+                    </select>
+
+
+                    <small>
+
+                        {% if current_remarks %}
+
+                            Klasifikasi NG terkunci sampai ticket selesai:
+
+                            <strong>
+                                {% if current_remarks == 'Process' %}
+                                    Reguler
+                                {% else %}
+                                    {{ current_remarks }}
+                                {% endif %}
+                            </strong>
+
+                        {% else %}
+
+                            Pilihan ini menjadi klasifikasi untuk seluruh part pada ticket aktif.
+
+                        {% endif %}
+
+                    </small>
+
+                </div>
+
+
+                <!-- LINE -->
+
+                <div class="field">
+
+                    <label for="line">
+                        Line
+                    </label>
+
+                    <select
+                        id="line"
+                        name="line"
+                        required
+                    >
+
+                        <option value="">
+                            Pilih Line
+                        </option>
+
+                        {% for line in lines %}
+
+                        <option
+                            value="{{ line.line }}"
+                            {% if current_line == line.line %}selected{% endif %}
+                        >
+                            {{ line.line }}
+                        </option>
+
+                        {% endfor %}
+
+                    </select>
+
+                </div>
+
+
+                <!-- MODEL -->
+
+                <div class="field">
+
+                    <label for="model">
+                        Model
+                    </label>
+
+                    <select
+                        id="model"
+                        name="model"
+                        required
+                    >
+
+                        <option value="">
+                            Pilih Model
+                        </option>
+
+                    </select>
+
+                </div>
+
+            </div>
+
+
+            <!-- ======================================================
+                 PART PICKER
+            ======================================================= -->
+
+            <div class="field part-picker-field">
+
+                <div class="field-label-row">
+
+                    <label for="partPickerToggle">
+                        Pilih Part
+                    </label>
+
+                    <span
+                        id="selectedCountBadge"
+                        class="selection-count"
+                    >
+                        0 dipilih
+                    </span>
+
+                </div>
+
+
+                <div
+                    class="part-picker"
+                    id="partPicker"
+                >
+
+                    <button
+                        type="button"
+                        class="part-picker-toggle"
+                        id="partPickerToggle"
+                        aria-expanded="false"
+                    >
+
+                        <span id="partPickerLabel">
+                            Pilih Part
+                        </span>
+
+                        <span class="picker-chevron">
+                            ⌄
+                        </span>
+
+                    </button>
+
+
+                    <div
+                        class="part-picker-panel"
+                        id="partPickerPanel"
+                        hidden
+                    >
+
+                        <div class="part-picker-toolbar">
+
+
+                            <div class="part-search-wrap">
+
+                                <span>
+                                    ⌕
+                                </span>
+
+                                <input
+                                    type="search"
+                                    id="partSearch"
+                                    placeholder="Cari nama / part number..."
+                                    autocomplete="off"
+                                >
+
+                            </div>
+
+
+                            <label class="fg-quantity-control" style="display:flex;align-items:center;gap:8px;font-size:13px;white-space:nowrap;">
+                                Qty FG
+                                <input type="number" id="fgQuantity" name="fg_quantity" min="1" step="1" value="1" style="width:76px;" aria-label="Jumlah FG yang di-crushing">
+                            </label>
+
+                            <div class="picker-actions">
+
+                                <button
+                                    type="button"
+                                    class="picker-action primary"
+                                    id="selectAllParts"
+                                >
+                                    ✓ Pilih Semua
+                                </button>
+
+                                <button
+                                    type="button"
+                                    class="picker-action"
+                                    id="clearAllParts"
+                                >
+                                    Batal Semua
+                                </button>
+
+                            </div>
+
+                        </div>
+
+
+                        <div
+                            class="part-picker-hint"
+                            id="partPickerHint"
+                        >
+                            Pilih Line dan Model terlebih dahulu.
+                        </div>
+
+
+                        <div
+                            class="part-options"
+                            id="partOptions"
+                        ></div>
+
+                    </div>
+
+                </div>
+
+
+                <small>
+
+                    Anda dapat memilih beberapa part sekaligus.
+                    Gunakan <strong>Pilih Semua</strong>
+                    untuk kasus NG satu unit penuh.
+
+                </small>
+
+            </div>
+
+
+            <!-- ======================================================
+                 SELECTED PARTS
+            ======================================================= -->
+
+            <div
+                id="selectedPartsSection"
+                class="selected-parts-section"
+                hidden
+            >
+
+                <div class="section-heading-row">
+
+                    <div>
+
+                        <h2>
+                            Part Terpilih
+                        </h2>
+
+                        <p>
+                            Atur quantity masing-masing part
+                            sebelum dimasukkan ke ticket.
+                        </p>
+
+                    </div>
+
+                    <div
+                        class="section-total"
+                        id="selectedTotalQty"
+                    >
+                        Total Qty: 0
+                    </div>
+
+                </div>
+
+
+                <div
+                    id="selectedPartsList"
+                    class="selected-parts-list"
+                ></div>
+
+            </div>
+
+
+            <!-- ======================================================
+                 JENIS NG + SHIFT
+            ======================================================= -->
+
+            <div class="production-form-grid compact-grid">
+
+
+                <!-- JENIS NG -->
+
+                <div class="field">
+
+                    <label for="jenis-ng">
+                        Jenis NG
+                    </label>
+
+                    <input
+                        type="text"
+                        name="jenis_ng"
+                        id="jenis-ng"
+                        list="jenis-ng-list"
+                        autocomplete="off"
+                        placeholder="Ketik atau pilih Jenis NG..."
+                        required
+                    >
+
+                    <datalist id="jenis-ng-list">
+
+                        {% for ng_type in ng_types %}
+
+                        <option value="{{ ng_type.name }}"></option>
+
+                        {% endfor %}
+
+                    </datalist>
+
+
+                    <small>
+                        Jenis NG yang dipilih akan diterapkan
+                        ke semua part dalam proses ini.
+                    </small>
+
+                </div>
+
+
+                <!-- SHIFT -->
+
+                <div class="field">
+
+                    <label for="shift">
+                        Shift
+                    </label>
+
+                    <select
+                        name="shift"
+                        id="shift"
+                        required
+                    >
+
+                        <option value="">
+                            Pilih Shift
+                        </option>
+
+                        <option
+                            value="A"
+                            {% if current_shift == "A" %}selected{% endif %}
+                        >
+                            A
+                        </option>
+
+                        <option
+                            value="B"
+                            {% if current_shift == "B" %}selected{% endif %}
+                        >
+                            B
+                        </option>
+
+                    </select>
+
+                </div>
+
+            </div>
+
+
+            <!-- ======================================================
+                 HIDDEN PART INPUTS
+            ======================================================= -->
+
+            <div id="hiddenPartInputs"></div>
+
+
+            <!-- ======================================================
+                 ADD PART BUTTON
+            ======================================================= -->
+
+            <button
+                type="submit"
+                class="primary-btn add-parts-button"
+                id="addPartsButton"
+                disabled
+            >
+                ＋ Masukkan Part ke Ticket
+            </button>
+
+        </form>
+
+
+        <!-- ==========================================================
+             CURRENT TICKET
+        =========================================================== -->
+
+        <div class="ticket-current-section">
+
+            <div class="section-heading-row">
+
+                <div>
+
+                    <h2>
+                        Part Dalam Ticket Saat Ini
+                    </h2>
+
+                    <p>
+                        Data berikut sudah tersimpan pada ticket sementara.
+                    </p>
+
+                </div>
+
+
+                {% if transactions|length > 0 %}
+
+                <div class="section-total">
+                    {{ transactions|length }} part
+                </div>
+
+                {% endif %}
+
+            </div>
+
+
+            <!-- LOCKED REMARK -->
+
+            {% if current_remarks %}
+
+            <div class="locked-remark">
+
+                <span>
+                    KLASIFIKASI NG
+                </span>
+
+                <strong>
+
+                    {% if current_remarks == 'Process' %}
+                        Reguler
+                    {% else %}
+                        {{ current_remarks }}
+                    {% endif %}
+
+                </strong>
+
+                <em>
+                    Locked
+                </em>
+
+            </div>
+
+            {% endif %}
+
+
+            <!-- ======================================================
+                 CURRENT TRANSACTION TABLE
+            ======================================================= -->
+
+            <div class="table-scroll">
+
+                <table class="table-modern production-ticket-table">
+
+                    <thead>
+
+                        <tr>
+
+                            <th>
+                                No
+                            </th>
+
+                            <th>
+                                Model
+                            </th>
+
+                            <th>
+                                Part Name
+                            </th>
+
+                            <th>
+                                Part Number
+                            </th>
+
+                            <th>
+                                Jenis NG
+                            </th>
+
+                            <th>
+                                Qty
+                            </th>
+
+                        </tr>
+
+                    </thead>
+
+
+                    <tbody>
+
+                        {% for trx in transactions %}
+
+                        <tr>
+
+                            <td>
+                                {{ loop.index }}
+                            </td>
+
+                            <td>
+                                {{ trx.model }}
+                            </td>
+
+                            <td>
+                                <strong>
+                                    {{ trx.part_name }}
+                                </strong>
+                            </td>
+
+                            <td>
+                                {{ trx.part_number }}
+                            </td>
+
+                            <td>
+                                {{ trx.jenis_ng or '-' }}
+                            </td>
+
+                            <td>
+                                <strong>
+                                    {{ trx.quantity }}
+                                </strong>
+                            </td>
+
+                        </tr>
+
+                        {% else %}
+
+                        <tr>
+
+                            <td
+                                colspan="6"
+                                class="empty-table"
+                            >
+                                Belum ada part dalam ticket.
+                                Pilih part di atas untuk memulai.
+                            </td>
+
+                        </tr>
+
+                        {% endfor %}
+
+                    </tbody>
+
+                </table>
+
+            </div>
+
+
+            <!-- ======================================================
+                 FINISH TICKET
+            ======================================================= -->
+
+            {% if transactions|length > 0 %}
+
+            <form
+                method="POST"
+                class="finish-ticket-form"
+                onsubmit="return confirm('Selesaikan ticket ini? Setelah selesai, ticket akan masuk ke proses Pulling.');"
+            >
+
+                <input
+                    type="hidden"
+                    name="action"
+                    value="finish_ticket"
+                >
+
+                <button
+                    type="submit"
+                    class="success-btn finish-ticket-button"
+                >
+                    ✓ Selesai & Buat Crushing Ticket
+                </button>
+
+            </form>
+
+            {% endif %}
+
+        </div>
+
+    </div>
+
+</div>
+
+
+<!-- ================================================================
+     UPLOAD PHOTO MODAL
+================================================================ -->
+
+<div
+    id="uploadModal"
+    class="modal-overlay"
+    style="display:none;"
+>
+
+    <div class="modal-box">
+
+
+        <div class="modal-header">
+
+            <div>
+
+                <p class="eyebrow">
+                    MASTER PART
+                </p>
+
+                <h2>
+                    Upload Foto Part
+                </h2>
+
+            </div>
+
+            <button
+                type="button"
+                id="closeModal"
+                class="modal-close"
+            >
+                ×
+            </button>
+
+        </div>
+
+
+        <div class="modal-body">
+
+            <div
+                class="upload-current-part"
+                id="uploadCurrentPart"
+            ></div>
+
+
+            <div class="upload-preview-wrap">
+
+                <img
+                    id="modalPreview"
+                    class="part-photo"
+                    style="display:none;"
+                >
+
+                <div
+                    id="modalPlaceholder"
+                    class="photo-placeholder"
+                >
+
+                    <div class="icon">
+                        📦
+                    </div>
+
+                    <div class="text">
+                        Belum ada foto
+                    </div>
+
+                </div>
+
+            </div>
+
+
+            <input
+                type="file"
+                id="modalFile"
+                accept="image/*"
+                capture="environment"
+                style="display:none;"
+            >
+
+
+            <div class="upload-actions">
+
+                <button
+                    type="button"
+                    id="cameraButton"
+                    class="approve-btn"
+                >
+                    📷 Ambil Foto
+                </button>
+
+                <button
+                    type="button"
+                    id="galleryButton"
+                    class="leader-btn"
+                >
+                    🖼 Galeri
+                </button>
+
+            </div>
+
+
+            <button
+                type="button"
+                id="savePhotoButton"
+                class="success-btn upload-save-button"
+            >
+                Simpan Foto
+            </button>
+
+        </div>
+
+    </div>
+
+</div>
+
+
+<!-- ================================================================
+     DATA DARI FLASK
+================================================================ -->
+
+<script
+    id="partsData"
+    type="application/json"
+>{{ parts_data | tojson }}</script>
+
+
+<script
+    id="ngTypesData"
+    type="application/json"
+>{{ ng_types | map(attribute='name') | list | tojson }}</script>
+
+
+<!-- ================================================================
+     PRODUCTION JAVASCRIPT
+================================================================ -->
+
+<script>
+
+(function () {
+
+    'use strict';
+
+
+    /* ============================================================
+       BASIC DATA
+    ============================================================ */
+
+    const body = document.body;
+
+
+    const partsDataElement =
+        document.getElementById('partsData');
+
+
+    const ngTypesDataElement =
+        document.getElementById('ngTypesData');
+
+
+    const allParts =
+        JSON.parse(
+            partsDataElement.textContent || '[]'
+        );
+
+
+    const allNgTypes =
+        JSON.parse(
+            ngTypesDataElement.textContent || '[]'
+        );
+
+
+    /* ============================================================
+       FORM ELEMENTS
+    ============================================================ */
+
+    const lineSelect =
+        document.getElementById('line');
+
+
+    const modelSelect =
+        document.getElementById('model');
+
+
+    const shiftSelect =
+        document.getElementById('shift');
+
+
+    const jenisNgInput =
+        document.getElementById('jenis-ng');
+
+
+    const remarksSelect =
+        document.getElementById('remarks');
+
+
+    const picker =
+        document.getElementById('partPicker');
+
+
+    const pickerToggle =
+        document.getElementById('partPickerToggle');
+
+
+    const pickerPanel =
+        document.getElementById('partPickerPanel');
+
+
+    const pickerLabel =
+        document.getElementById('partPickerLabel');
+
+
+    const pickerHint =
+        document.getElementById('partPickerHint');
+
+
+    const partSearch =
+        document.getElementById('partSearch');
+
+
+    const partOptions =
+        document.getElementById('partOptions');
+
+
+    const selectedPartsSection =
+        document.getElementById('selectedPartsSection');
+
+
+    const selectedPartsList =
+        document.getElementById('selectedPartsList');
+
+
+    const hiddenPartInputs =
+        document.getElementById('hiddenPartInputs');
+
+
+    const selectedCountBadge =
+        document.getElementById('selectedCountBadge');
+
+
+    const selectedTotalQty =
+        document.getElementById('selectedTotalQty');
+
+
+    const addPartsButton =
+        document.getElementById('addPartsButton');
+
+
+    const selectAllButton =
+        document.getElementById('selectAllParts');
+
+
+    const clearAllButton =
+        document.getElementById('clearAllParts');
+
+
+    const form =
+        document.getElementById('partForm');
+
+
+    /* ============================================================
+       CURRENT TICKET DATA
+    ============================================================ */
+
+    const currentLine =
+        body.dataset.currentLine || '';
+
+
+    const currentModel =
+        body.dataset.currentModel || '';
+
+
+    const currentShift =
+        body.dataset.currentShift || '';
+
+
+    /*
+     * Sebelumnya bagian ini menggunakan Jinja langsung di dalam
+     * JavaScript:
+     *
+     * const canUploadPhoto = {{ (is_admin or is_maris)|tojson }};
+     *
+     * Itu menyebabkan VS Code menampilkan banyak syntax error.
+     *
+     * Sekarang nilainya dikirim melalui data attribute pada <body>.
+     */
+
+    const canUploadPhoto =
+        body.dataset.canUploadPhoto === 'true';
+
+
+    /* ============================================================
+       SELECTED PARTS
+    ============================================================ */
+
+    const selected =
+        new Map();
+
+
+    /* ============================================================
+       PART KEY
+    ============================================================ */
+
+    function keyFor(part) {
+
+        return [
+            part.line,
+            part.model,
+            part.part_number
+        ].join('||');
+
+    }
+
+
+    /* ============================================================
+       FILTER PART
+    ============================================================ */
+
+    function getFilteredParts() {
+
+        const line =
+            lineSelect.value;
+
+
+        const model =
+            modelSelect.value;
+
+
+        const query =
+            partSearch.value
+                .trim()
+                .toLowerCase();
+
+
+        return allParts.filter(part => {
+
+            if (
+                part.line !== line ||
+                part.model !== model
+            ) {
+                return false;
+            }
+
+
+            if (!query) {
+                return true;
+            }
+
+
+            return (
+                (part.part_name || '')
+                    .toLowerCase()
+                    .includes(query)
+                ||
+                (part.part_number || '')
+                    .toLowerCase()
+                    .includes(query)
+                ||
+                (part.sku || '')
+                    .toLowerCase()
+                    .includes(query)
+            );
+
+        });
+
+    }
+
+
+    /* ============================================================
+       POPULATE MODEL
+    ============================================================ */
+
+    function populateModels(preselect = '') {
+
+        const line =
+            lineSelect.value;
+
+
+        modelSelect.innerHTML =
+            '<option value="">Pilih Model</option>';
+
+
+        partOptions.innerHTML = '';
+
+
+        selected.clear();
+
+
+        renderSelected();
+
+
+        const models = [
+            ...new Set(
+                allParts
+                    .filter(part => part.line === line)
+                    .map(part => part.model)
+                    .filter(Boolean)
+            )
+        ];
+
+
+        models.forEach(model => {
+
+            const option =
+                document.createElement('option');
+
+
+            option.value =
+                model;
+
+
+            option.textContent =
+                model;
+
+
+            if (model === preselect) {
+
+                option.selected =
+                    true;
+
+            }
+
+
+            modelSelect.appendChild(
+                option
+            );
+
+        });
+
+
+        renderPartOptions();
+
+    }
+
+
+    /* ============================================================
+       RENDER PART OPTIONS
+    ============================================================ */
+
+    function renderPartOptions() {
+
+        const line =
+            lineSelect.value;
+
+
+        const model =
+            modelSelect.value;
+
+
+        partOptions.innerHTML = '';
+
+
+        if (!line || !model) {
+
+            pickerHint.textContent =
+                'Pilih Line dan Model terlebih dahulu.';
+
+
+            pickerHint.style.display =
+                'block';
+
+
+            return;
+
+        }
+
+
+        const parts =
+            getFilteredParts();
+
+
+        pickerHint.textContent =
+            parts.length
+                ? `${parts.length} part tersedia`
+                : 'Part tidak ditemukan.';
+
+
+        pickerHint.style.display =
+            'block';
+
+
+        parts.forEach(part => {
+
+            const key =
+                keyFor(part);
+
+
+            const label =
+                document.createElement('label');
+
+
+            label.className =
+                'part-option' +
+                (
+                    selected.has(key)
+                        ? ' is-selected'
+                        : ''
+                );
+
+
+            label.dataset.key =
+                key;
+
+
+            label.innerHTML = `
+                <input
+                    type="checkbox"
+                    value="${escapeHtml(key)}"
+                    ${selected.has(key) ? 'checked' : ''}
+                >
+
+                <span class="part-option-check">
+                    ✓
+                </span>
+
+                <span class="part-option-main">
+
+                    <strong>
+                        ${escapeHtml(part.part_name || '-')}
+                    </strong>
+
+                    <small>
+                        ${escapeHtml(part.part_number || '-')}
+                    </small>
+
+                </span>
+
+                <span class="part-option-arrow">
+                    ›
+                </span>
+            `;
+
+
+            const checkbox =
+                label.querySelector('input');
+
+
+            checkbox.addEventListener(
+                'change',
+                event => {
+
+                    if (event.target.checked) {
+
+                        const fgQtyInput = document.getElementById('fgQuantity');
+                        const fgQty = Math.max(1, parseInt(fgQtyInput?.value || '1', 10) || 1);
+                        selected.set(
+                            key,
+                            {
+                                part,
+                                qty: selected.get(key)?.qty || 1,
+                                bomDerived: false
+                            }
+                        );
+
+                    } else {
+
+                        selected.delete(key);
+
+                    }
+
+
+                    renderSelected();
+
+
+                    label.classList.toggle(
+                        'is-selected',
+                        event.target.checked
+                    );
+
+                }
+            );
+
+
+            partOptions.appendChild(
+                label
+            );
+
+        });
+
+    }
+
+
+    /* ============================================================
+       RENDER SELECTED PARTS
+    ============================================================ */
+
+    function renderSelected() {
+
+        selectedPartsList.innerHTML =
+            '';
+
+
+        hiddenPartInputs.innerHTML =
+            '';
+
+
+        const entries =
+            [...selected.values()];
+
+
+        selectedPartsSection.hidden =
+            entries.length === 0;
+
+
+        selectedCountBadge.textContent =
+            `${entries.length} dipilih`;
+
+
+        pickerLabel.textContent =
+            entries.length
+                ? `${entries.length} part dipilih`
+                : 'Pilih Part';
+
+
+        addPartsButton.disabled =
+            entries.length === 0;
+
+
+        let totalQty =
+            0;
+
+
+        entries.forEach(
+            (item, index) => {
+
+                const part =
+                    item.part;
+
+
+                const qty =
+                    Math.max(
+                        1,
+                        parseInt(item.qty, 10) || 1
+                    );
+
+
+                item.qty =
+                    qty;
+
+
+                totalQty +=
+                    qty;
+
+
+                const card =
+                    document.createElement('div');
+
+
+                card.className =
+                    'selected-part-card';
+
+
+                card.dataset.key =
+                    keyFor(part);
+
+
+                const photoHtml =
+                    part.photo
+
+                        ? `
+                            <img
+                                src="/static/part/${encodeURIComponent(part.photo)}"
+                                alt="Foto part"
+                            >
+                          `
+
+                        : `
+                            <div class="selected-part-photo-placeholder">
+                                📦
+                            </div>
+                          `;
+
+
+                card.innerHTML = `
+
+                    <div class="selected-part-photo">
+
+                        ${photoHtml}
+
+                    </div>
+
+
+                    <div class="selected-part-info">
+
+                        <span class="selected-part-number">
+                            ${escapeHtml(part.part_number)}
+                        </span>
+
+                        <strong>
+                            ${escapeHtml(part.part_name)}
+                        </strong>
+
+                        <small>
+                            Return Location:
+                            ${escapeHtml(part.return_location || '-')}
+                        </small>
+
+
+                        ${
+                            canUploadPhoto
+
+                                ? `
+                                    <button
+                                        type="button"
+                                        class="selected-upload-link"
+                                    >
+                                        ${
+                                            part.photo
+                                                ? 'Ganti Foto'
+                                                : 'Upload Foto'
+                                        }
+                                    </button>
+                                  `
+
+                                : ''
+                        }
+
+                    </div>
+
+
+                    <div class="selected-part-qty">
+
+                        <label>
+                            Qty
+                        </label>
+
+                        <input
+                            class="selected-qty-input"
+                            type="number"
+                            min="1"
+                            step="1"
+                            value="${qty}"
+                            ${item.bomDerived ? 'readonly title="Qty dihitung otomatis dari Qty Child × Qty FG"' : ''}
+                            inputmode="numeric"
+                        >
+
+                    </div>
+
+
+                    <button
+                        type="button"
+                        class="remove-selected-part"
+                        title="Hapus dari pilihan"
+                    >
+                        ×
+                    </button>
+                `;
+
+
+                const uploadButton =
+                    card.querySelector(
+                        '.selected-upload-link'
+                    );
+
+
+                if (uploadButton) {
+
+                    uploadButton.addEventListener(
+                        'click',
+                        () => {
+
+                            openPartPhotoUpload(
+                                part.part_number,
+                                part.part_name
+                            );
+
+                        }
+                    );
+
+                }
+
+
+                const qtyInput =
+                    card.querySelector(
+                        '.selected-qty-input'
+                    );
+
+
+                qtyInput.addEventListener(
+                    'input',
+                    event => {
+
+                        item.qty =
+                            Math.max(
+                                1,
+                                parseInt(
+                                    event.target.value,
+                                    10
+                                ) || 1
+                            );
+
+
+                        event.target.value =
+                            item.qty;
+
+
+                        renderHiddenInputsAndTotal();
+
+                    }
+                );
+
+
+                const removeButton =
+                    card.querySelector(
+                        '.remove-selected-part'
+                    );
+
+
+                removeButton.addEventListener(
+                    'click',
+                    () => {
+
+                        selected.delete(
+                            keyFor(part)
+                        );
+
+
+                        renderSelected();
+
+
+                        renderPartOptions();
+
+                    }
+                );
+
+
+                selectedPartsList.appendChild(
+                    card
+                );
+
+
+                /* Hidden part number */
+
+                const pn =
+                    document.createElement('input');
+
+
+                pn.type =
+                    'hidden';
+
+
+                pn.name =
+                    'part_number';
+
+
+                pn.value =
+                    part.part_number;
+
+
+                hiddenPartInputs.appendChild(
+                    pn
+                );
+
+
+                /* Hidden quantity */
+
+                const hiddenQtyInput =
+                    document.createElement('input');
+
+
+                hiddenQtyInput.type =
+                    'hidden';
+
+
+                hiddenQtyInput.name =
+                    'qty';
+
+
+                hiddenQtyInput.value =
+                    qty;
+
+
+                hiddenQtyInput.dataset.partKey =
+                    keyFor(part);
+
+
+                hiddenPartInputs.appendChild(
+                    hiddenQtyInput
+                );
+
+                const sourceInput = document.createElement('input');
+                sourceInput.type = 'hidden';
+                sourceInput.name = 'source_type';
+                sourceInput.value = item.bomDerived ? 'bom' : 'manual';
+                sourceInput.dataset.partKey = keyFor(part);
+                hiddenPartInputs.appendChild(sourceInput);
+
+            }
+        );
+
+
+        selectedTotalQty.textContent =
+            `Total Qty: ${totalQty}`;
+
+    }
+
+
+    /* ============================================================
+       UPDATE HIDDEN INPUTS
+    ============================================================ */
+
+    function renderHiddenInputsAndTotal() {
+
+        let totalQty =
+            0;
+
+
+        hiddenPartInputs
+            .querySelectorAll(
+                'input[name="qty"]'
+            )
+            .forEach(input => {
+
+                const item =
+                    selected.get(
+                        input.dataset.partKey
+                    );
+
+
+                if (item) {
+
+                    const qty =
+                        Math.max(
+                            1,
+                            parseInt(item.qty, 10) || 1
+                        );
+
+
+                    input.value =
+                        qty;
+
+
+                    totalQty +=
+                        qty;
+
+                }
+
+            });
+
+
+        selectedTotalQty.textContent =
+            `Total Qty: ${totalQty}`;
+
+    }
+
+
+    /* ============================================================
+       ESCAPE HTML
+    ============================================================ */
+
+    function escapeHtml(value) {
+
+        return String(
+            value ?? ''
+        ).replace(
+            /[&<>'"]/g,
+            char => ({
+                '&': '&amp;',
+                '<': '&lt;',
+                '>': '&gt;',
+                "'": '&#39;',
+                '"': '&quot;'
+            }[char])
+        );
+
+    }
+
+
+    /* ============================================================
+       PART PICKER TOGGLE
+    ============================================================ */
+
+    pickerToggle.addEventListener(
+        'click',
+        () => {
+
+            const open =
+                !pickerPanel.hidden;
+
+
+            pickerPanel.hidden =
+                open;
+
+
+            pickerToggle.setAttribute(
+                'aria-expanded',
+                String(!open)
+            );
+
+
+            picker.classList.toggle(
+                'is-open',
+                !open
+            );
+
+
+            if (!open) {
+
+                setTimeout(
+                    () => partSearch.focus(),
+                    50
+                );
+
+            }
+
+        }
+    );
+
+
+    /* ============================================================
+       CLOSE PART PICKER
+    ============================================================ */
+
+    document.addEventListener(
+        'click',
+        event => {
+
+            if (!picker.contains(event.target)) {
+
+                pickerPanel.hidden =
+                    true;
+
+
+                pickerToggle.setAttribute(
+                    'aria-expanded',
+                    'false'
+                );
+
+
+                picker.classList.remove(
+                    'is-open'
+                );
+
+            }
+
+        }
+    );
+
+
+    /* ============================================================
+       SEARCH PART
+    ============================================================ */
+
+    partSearch.addEventListener(
+        'input',
+        renderPartOptions
+    );
+
+
+    /* ============================================================
+       SELECT ALL
+    ============================================================ */
+
+    selectAllButton.addEventListener(
+        'click',
+        () => {
+
+            getFilteredParts().forEach(
+                part => {
+
+                    const key =
+                        keyFor(part);
+
+
+                    selected.set(
+                        key,
+                        {
+                            part,
+                            qty: Math.max(1, parseInt(part.qty_child || 1, 10) || 1) * Math.max(1, parseInt(document.getElementById('fgQuantity')?.value || '1', 10) || 1),
+                            bomDerived: true
+                        }
+                    );
+
+                }
+            );
+
+
+            renderSelected();
+
+
+            renderPartOptions();
+
+        }
+    );
+
+
+    const fgQuantityInput = document.getElementById('fgQuantity');
+    if (fgQuantityInput) {
+        fgQuantityInput.addEventListener('input', () => {
+            const fgQty = Math.max(1, parseInt(fgQuantityInput.value || '1', 10) || 1);
+            selected.forEach(item => {
+                if (item.bomDerived) {
+                    item.qty = Math.max(1, parseInt(item.part.qty_child || 1, 10) || 1) * fgQty;
+                }
+            });
+            renderSelected();
+        });
+    }
+
+
+    /* ============================================================
+       CLEAR ALL
+    ============================================================ */
+
+    clearAllButton.addEventListener(
+        'click',
+        () => {
+
+            selected.clear();
+
+
+            renderSelected();
+
+
+            renderPartOptions();
+
+        }
+    );
+
+
+    /* ============================================================
+       LINE CHANGE
+    ============================================================ */
+
+    lineSelect.addEventListener(
+        'change',
+        () => {
+
+            populateModels();
+
+        }
+    );
+
+
+    /* ============================================================
+       MODEL CHANGE
+    ============================================================ */
+
+    modelSelect.addEventListener(
+        'change',
+        () => {
+
+            selected.clear();
+
+
+            renderSelected();
+
+
+            renderPartOptions();
+
+        }
+    );
+
+
+    /* ============================================================
+       JENIS NG VALIDATION
+    ============================================================ */
+
+    jenisNgInput.addEventListener(
+        'input',
+        () => {
+
+            const value =
+                jenisNgInput.value.trim();
+
+
+            jenisNgInput.setCustomValidity(
+
+                value &&
+                !allNgTypes.includes(value)
+
+                    ? 'Pilih Jenis NG yang tersedia di Master.'
+
+                    : ''
+
+            );
+
+        }
+    );
+
+
+    /* ============================================================
+       FORM SUBMIT
+    ============================================================ */
+
+    form.addEventListener(
+        'submit',
+        event => {
+
+            if (!selected.size) {
+
+                event.preventDefault();
+
+
+                alert(
+                    'Silakan pilih minimal satu part.'
+                );
+
+
+                pickerToggle.focus();
+
+
+                return;
+
+            }
+
+
+            if (
+                !lineSelect.value ||
+                !modelSelect.value ||
+                !jenisNgInput.value.trim() ||
+                !shiftSelect.value ||
+                !remarksSelect.value
+            ) {
+
+                event.preventDefault();
+
+
+                alert(
+                    'Lengkapi Klasifikasi NG, Line, Model, Jenis NG, dan Shift terlebih dahulu.'
+                );
+
+
+                return;
+
+            }
+
+
+            renderHiddenInputsAndTotal();
+
+        }
+    );
+
+
+    /* ============================================================
+       UPLOAD FOTO
+    ============================================================ */
+
+    const uploadModal =
+        document.getElementById('uploadModal');
+
+
+    const closeModal =
+        document.getElementById('closeModal');
+
+
+    const modalFile =
+        document.getElementById('modalFile');
+
+
+    const modalPreview =
+        document.getElementById('modalPreview');
+
+
+    const modalPlaceholder =
+        document.getElementById('modalPlaceholder');
+
+
+    const cameraButton =
+        document.getElementById('cameraButton');
+
+
+    const galleryButton =
+        document.getElementById('galleryButton');
+
+
+    const savePhotoButton =
+        document.getElementById('savePhotoButton');
+
+
+    let uploadPartNumber =
+        '';
+
+
+    window.openPartPhotoUpload =
+        function (partNumber, partName) {
+
+            uploadPartNumber =
+                partNumber;
+
+
+            document.getElementById(
+                'uploadCurrentPart'
+            ).textContent =
+                `${partName} • ${partNumber}`;
+
+
+            uploadModal.style.display =
+                'flex';
+
+
+            modalPreview.style.display =
+                'none';
+
+
+            modalPlaceholder.style.display =
+                'flex';
+
+
+            modalFile.value =
+                '';
+
+        };
+
+
+    function closeUploadModal() {
+
+        uploadModal.style.display =
+            'none';
+
+
+        modalFile.value =
+            '';
+
+    }
+
+
+    closeModal.addEventListener(
+        'click',
+        closeUploadModal
+    );
+
+
+    uploadModal.addEventListener(
+        'click',
+        event => {
+
+            if (event.target === uploadModal) {
+
+                closeUploadModal();
+
+            }
+
+        }
+    );
+
+
+    cameraButton.addEventListener(
+        'click',
+        () => {
+
+            modalFile.setAttribute(
+                'capture',
+                'environment'
+            );
+
+
+            modalFile.click();
+
+        }
+    );
+
+
+    galleryButton.addEventListener(
+        'click',
+        () => {
+
+            modalFile.removeAttribute(
+                'capture'
+            );
+
+
+            modalFile.click();
+
+        }
+    );
+
+
+    modalFile.addEventListener(
+        'change',
+        () => {
+
+            const file =
+                modalFile.files[0];
+
+
+            if (!file) {
+                return;
+            }
+
+
+            const reader =
+                new FileReader();
+
+
+            reader.onload =
+                event => {
+
+                    modalPreview.src =
+                        event.target.result;
+
+
+                    modalPreview.style.display =
+                        'block';
+
+
+                    modalPlaceholder.style.display =
+                        'none';
+
+                };
+
+
+            reader.readAsDataURL(
+                file
+            );
+
+        }
+    );
+
+
+    savePhotoButton.addEventListener(
+        'click',
+        async () => {
+
+            if (
+                !uploadPartNumber ||
+                !modalFile.files.length
+            ) {
+
+                alert(
+                    'Pilih foto terlebih dahulu.'
+                );
+
+
+                return;
+
+            }
+
+
+            savePhotoButton.disabled =
+                true;
+
+
+            savePhotoButton.textContent =
+                'Mengupload...';
+
+
+            try {
+
+                const fd =
+                    new FormData();
+
+
+                fd.append(
+                    'photo',
+                    modalFile.files[0]
+                );
+
+
+                const response =
+                    await fetch(
+                        `/upload-photo/${encodeURIComponent(uploadPartNumber)}`,
+                        {
+                            method: 'POST',
+                            body: fd
+                        }
+                    );
+
+
+                const result =
+                    await response.json();
+
+
+                if (!response.ok) {
+
+                    throw new Error(
+                        result.message ||
+                        'Upload gagal.'
+                    );
+
+                }
+
+
+                allParts.forEach(
+                    part => {
+
+                        if (
+                            part.part_number ===
+                            uploadPartNumber
+                        ) {
+
+                            part.photo =
+                                result.photo;
+
+                        }
+
+                    }
+                );
+
+
+                closeUploadModal();
+
+
+                renderSelected();
+
+
+                alert(
+                    'Foto berhasil disimpan.'
+                );
+
+
+            } catch (error) {
+
+                alert(
+                    error.message ||
+                    'Upload gagal.'
+                );
+
+
+            } finally {
+
+                savePhotoButton.disabled =
+                    false;
+
+
+                savePhotoButton.textContent =
+                    'Simpan Foto';
+
+            }
+
+        }
+    );
+
+
+    /* ============================================================
+       INITIAL STATE
+    ============================================================ */
+
+    populateModels(
+        currentModel
+    );
+
+
+    if (currentModel) {
+
+        modelSelect.value =
+            currentModel;
+
+    }
+
+
+    if (currentShift) {
+
+        shiftSelect.value =
+            currentShift;
+
+    }
+
+
+    renderPartOptions();
+
+})();
+
+</script>
+
+
+<!-- ================================================================
+     FOOTER
+================================================================ -->
+
+<footer class="app-footer">
+
+    <strong>
+        Crushing App by: Anjar S
+    </strong>
+
+    <span>
+        NG Material Control · © 2026
+    </span>
+
+</footer>
+
+
+</body>
+</html>

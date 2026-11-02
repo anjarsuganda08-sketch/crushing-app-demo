@@ -1,0 +1,2443 @@
+<!DOCTYPE html>
+<html lang="id">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <title>
+        Admin MARIS - Crushing App
+    </title>
+
+    <link
+        rel="stylesheet"
+        href="{{ url_for(
+            'static',
+            filename='css/style.css'
+        ) }}"
+    >
+
+    <style>
+
+        /* ==================================================
+           GENERAL
+        ================================================== */
+
+        body {
+            font-family: Arial, sans-serif;
+        }
+
+
+        .admin-container {
+
+            max-width: 1200px;
+
+            margin: 30px auto;
+
+            padding: 20px;
+
+        }
+
+
+        /* ==================================================
+           HEADER
+        ================================================== */
+
+        .admin-header {
+
+            display: flex;
+
+            justify-content: space-between;
+
+            align-items: center;
+
+            gap: 20px;
+
+            margin-bottom: 25px;
+
+        }
+
+
+        .admin-header h1 {
+
+            margin: 0;
+
+        }
+
+
+        .admin-header p {
+
+            margin-top: 6px;
+
+            color: #666;
+
+        }
+
+
+        .back-button {
+
+            display: inline-block;
+
+            padding: 10px 16px;
+
+            background: #374151;
+
+            color: white;
+
+            text-decoration: none;
+
+            border-radius: 8px;
+
+        }
+
+
+        /* ==================================================
+           NOTIFICATION
+        ================================================== */
+
+        .notification {
+
+            padding: 12px 15px;
+
+            border-radius: 8px;
+
+            margin-bottom: 20px;
+
+            font-weight: 600;
+
+        }
+
+
+        .notification.error {
+
+            background: #fee2e2;
+
+            color: #b91c1c;
+
+            border: 1px solid #fecaca;
+
+        }
+
+
+        .notification.success {
+
+            background: #dcfce7;
+
+            color: #166534;
+
+            border: 1px solid #bbf7d0;
+
+        }
+
+
+        /* ==================================================
+           SECTION
+        ================================================== */
+
+        .section {
+
+            background: white;
+
+            border-radius: 12px;
+
+            padding: 20px;
+
+            margin-bottom: 25px;
+
+            box-shadow:
+                0 3px 12px rgba(0,0,0,0.08);
+
+        }
+
+
+        .section h2 {
+
+            margin-top: 0;
+
+        }
+
+
+        /* ==================================================
+           TABLE
+        ================================================== */
+
+        .table-wrapper {
+
+            overflow-x: auto;
+
+        }
+
+
+        table {
+
+            width: 100%;
+
+            border-collapse: collapse;
+
+        }
+
+
+        th,
+        td {
+
+            padding: 11px;
+
+            border: 1px solid #ddd;
+
+            text-align: left;
+
+            vertical-align: middle;
+
+        }
+
+
+        th {
+
+            background: #f3f4f6;
+
+        }
+
+
+        /* ==================================================
+           STATUS
+        ================================================== */
+
+        .status {
+
+            display: inline-block;
+
+            padding: 5px 9px;
+
+            border-radius: 20px;
+
+            font-size: 12px;
+
+            font-weight: bold;
+
+        }
+
+
+        .status-approved {
+
+            background: #dbeafe;
+
+            color: #1d4ed8;
+
+        }
+
+
+        .status-completed {
+
+            background: #dcfce7;
+
+            color: #166534;
+
+        }
+
+
+        /* ==================================================
+           MARIS FORM
+        ================================================== */
+
+        .maris-form {
+
+            display: flex;
+
+            gap: 8px;
+
+            align-items: center;
+
+            min-width: 300px;
+
+        }
+
+
+        .maris-input {
+
+            width: 180px;
+
+            padding: 9px 10px;
+
+            border: 1px solid #ccc;
+
+            border-radius: 7px;
+
+            box-sizing: border-box;
+
+        }
+
+
+        .maris-button {
+
+            padding: 9px 13px;
+
+            border: none;
+
+            border-radius: 7px;
+
+            background: #2563eb;
+
+            color: white;
+
+            cursor: pointer;
+
+            font-weight: bold;
+
+        }
+
+
+        .maris-button:hover {
+
+            background: #1d4ed8;
+
+        }
+
+        .edit-ticket-button {
+            display:inline-flex; align-items:center; gap:6px; margin-top:10px;
+            padding:9px 12px; border:1px solid #dbe5f1; border-radius:9px;
+            background:#fff; color:#1d4ed8; font-weight:800; cursor:pointer;
+        }
+        .edit-ticket-button:hover { background:#eff6ff; }
+        .ticket-edit-panel { margin-top:14px; padding:16px; border:1px solid #dbe5f1; border-radius:14px; background:#fff; }
+        .ticket-edit-panel h3 { margin:0 0 5px; font-size:15px; }
+        .ticket-edit-note { margin:0 0 12px; color:#64748b; font-size:12px; }
+        .edit-item-row { display:grid; grid-template-columns:1fr 110px 90px; gap:10px; align-items:center; padding:9px 0; border-bottom:1px solid #edf2f7; }
+        .edit-item-row:last-child { border-bottom:0; }
+        .edit-qty-input { width:100%; padding:8px; border:1px solid #d7dee8; border-radius:8px; }
+        .edit-delete-label { display:flex; gap:5px; align-items:center; color:#b91c1c; font-size:11px; font-weight:800; }
+        .edit-password-row { display:flex; gap:8px; margin-top:14px; padding-top:14px; border-top:1px solid #e2e8f0; }
+        .edit-password-input { flex:1; padding:10px 12px; border:1px solid #d7dee8; border-radius:9px; }
+        .edit-submit-button { padding:10px 14px; border:0; border-radius:9px; background:#1d4ed8; color:#fff; font-weight:800; cursor:pointer; }
+        .edit-cancel-button { padding:10px 14px; border:1px solid #dbe5f1; border-radius:9px; background:#fff; color:#475569; font-weight:800; cursor:pointer; }
+        @media (max-width:700px) { .edit-item-row { grid-template-columns:1fr 90px; } .edit-delete-label { grid-column:1/-1; } .edit-password-row { flex-direction:column; } }
+
+
+
+        /* ==================================================
+           PENCARIAN TICKET LAMA MARIS
+        ================================================== */
+
+        .maris-search-box {
+            margin-bottom: 25px;
+            padding: 20px;
+            background: #ffffff;
+            border: 1px solid #e2e8f0;
+            border-radius: 12px;
+            box-shadow: 0 3px 12px rgba(0,0,0,0.06);
+        }
+
+        .maris-search-title {
+            margin: 0 0 5px;
+            font-size: 20px;
+            font-weight: 800;
+            color: #0f172a;
+        }
+
+        .maris-search-note {
+            margin: 0 0 14px;
+            color: #64748b;
+            font-size: 12px;
+            line-height: 1.5;
+        }
+
+        .maris-search-form {
+            display: flex;
+            gap: 9px;
+            align-items: center;
+            max-width: 700px;
+        }
+
+        .maris-search-input {
+            flex: 1;
+            min-width: 0;
+            height: 40px;
+            padding: 0 12px;
+            border: 1px solid #cbd5e1;
+            border-radius: 8px;
+            background: #ffffff;
+            color: #0f172a;
+            outline: none;
+        }
+
+        .maris-search-input:focus {
+            border-color: #2563eb;
+            box-shadow: 0 0 0 3px rgba(37,99,235,.10);
+        }
+
+        .maris-search-button {
+            height: 40px;
+            padding: 0 16px;
+            border: 0;
+            border-radius: 8px;
+            background: #2563eb;
+            color: #ffffff;
+            font-weight: 800;
+            cursor: pointer;
+        }
+
+        .maris-search-button:hover {
+            background: #1d4ed8;
+        }
+
+        .maris-search-reset {
+            height: 40px;
+            padding: 0 14px;
+            display: inline-flex;
+            align-items: center;
+            text-decoration: none;
+            border: 1px solid #dbe5f1;
+            border-radius: 8px;
+            background: #ffffff;
+            color: #475569;
+            font-weight: 700;
+        }
+
+        .maris-search-result {
+            margin-top: 16px;
+            padding: 15px;
+            border: 1px solid #bfdbfe;
+            border-left: 4px solid #2563eb;
+            border-radius: 10px;
+            background: #eff6ff;
+        }
+
+        .maris-search-result-title {
+            margin: 0 0 10px;
+            color: #1e3a8a;
+            font-size: 14px;
+            font-weight: 800;
+        }
+
+        .maris-search-result-grid {
+            display: grid;
+            grid-template-columns: repeat(4, minmax(0, 1fr));
+            gap: 9px;
+            margin-bottom: 12px;
+        }
+
+        .maris-search-info {
+            padding: 9px 10px;
+            border-radius: 8px;
+            background: rgba(255,255,255,.72);
+            border: 1px solid #dbeafe;
+        }
+
+        .maris-search-info span {
+            display: block;
+            margin-bottom: 3px;
+            color: #64748b;
+            font-size: 10px;
+        }
+
+        .maris-search-info strong {
+            color: #0f172a;
+            font-size: 12px;
+        }
+
+        .maris-search-message {
+            margin-top: 14px;
+            padding: 11px 12px;
+            border-radius: 8px;
+            border: 1px solid #fecaca;
+            background: #fef2f2;
+            color: #991b1b;
+            font-size: 12px;
+            font-weight: 700;
+        }
+
+        @media (max-width: 800px) {
+            .maris-search-result-grid {
+                grid-template-columns: repeat(2, minmax(0, 1fr));
+            }
+        }
+
+        @media (max-width: 600px) {
+            .maris-search-form {
+                flex-direction: column;
+                align-items: stretch;
+            }
+
+            .maris-search-input,
+            .maris-search-button,
+            .maris-search-reset {
+                width: 100%;
+            }
+
+            .maris-search-result-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        /* ==================================================
+           EMPTY MESSAGE
+        ================================================== */
+
+        .empty-message {
+
+            text-align: center;
+
+            padding: 25px;
+
+            color: #666;
+
+        }
+
+
+        /* ==================================================
+           SUMMARY
+        ================================================== */
+
+        .summary-box {
+
+            display: flex;
+
+            gap: 15px;
+
+            flex-wrap: wrap;
+
+            margin-bottom: 25px;
+
+        }
+
+
+        .summary-card {
+
+            flex: 1;
+
+            min-width: 180px;
+
+            padding: 18px;
+
+            background: white;
+
+            border-radius: 10px;
+
+            box-shadow:
+                0 3px 12px rgba(0,0,0,0.07);
+
+        }
+
+
+        .summary-card .number {
+
+            font-size: 28px;
+
+            font-weight: bold;
+
+            margin-top: 5px;
+
+        }
+
+
+        /* ==================================================
+           TICKET BUTTON
+        ================================================== */
+
+        .ticket-toggle {
+
+            background: none;
+
+            border: none;
+
+            padding: 0;
+
+            margin: 0;
+
+            color: #2563eb;
+
+            font-weight: bold;
+
+            cursor: pointer;
+
+            font-size: inherit;
+
+            text-align: left;
+
+        }
+
+
+        .ticket-toggle:hover {
+
+            text-decoration: underline;
+
+        }
+
+
+        .ticket-arrow {
+
+            display: inline-block;
+
+            margin-left: 6px;
+
+            transition:
+                transform 0.2s ease;
+
+        }
+
+
+        .ticket-toggle.open
+        .ticket-arrow {
+
+            transform:
+                rotate(180deg);
+
+        }
+
+
+        /* ==================================================
+           DETAIL TICKET
+        ================================================== */
+
+        .ticket-detail-row {
+
+            display: none;
+
+        }
+
+
+        .ticket-detail-row.open {
+
+            display: table-row;
+
+        }
+
+
+        .ticket-detail {
+
+            background: #f8fafc;
+
+            padding: 18px;
+
+        }
+
+
+        .ticket-detail-header {
+
+            display: flex;
+
+            justify-content: space-between;
+
+            align-items: center;
+
+            gap: 15px;
+
+            margin-bottom: 15px;
+
+            flex-wrap: wrap;
+
+        }
+
+
+        .ticket-detail-title {
+
+            font-size: 17px;
+
+            font-weight: bold;
+
+            color: #111827;
+
+        }
+
+
+        .ticket-detail-info {
+
+            display: flex;
+
+            gap: 12px;
+
+            flex-wrap: wrap;
+
+            margin-bottom: 15px;
+
+        }
+
+
+        .detail-badge {
+
+            background: white;
+
+            border: 1px solid #e5e7eb;
+
+            border-radius: 7px;
+
+            padding: 7px 10px;
+
+            font-size: 13px;
+
+        }
+
+
+        /* ==================================================
+           DETAIL TABLE
+        ================================================== */
+
+        .detail-table {
+
+            width: 100%;
+
+            border-collapse: collapse;
+
+            background: white;
+
+            margin-top: 10px;
+
+        }
+
+
+        .detail-table th {
+
+            background: #e5e7eb;
+
+            color: #374151;
+
+        }
+
+
+        .detail-table th,
+        .detail-table td {
+
+            padding: 10px;
+
+            border: 1px solid #d1d5db;
+
+        }
+
+
+        .detail-table td {
+
+            vertical-align: middle;
+
+        }
+
+
+        /* ==================================================
+           COPY PART NUMBER
+        ================================================== */
+
+        .part-number-copy {
+
+            display: inline-flex;
+
+            align-items: center;
+
+            gap: 7px;
+
+            border: none;
+
+            background: #eff6ff;
+
+            color: #1d4ed8;
+
+            padding: 7px 9px;
+
+            border-radius: 6px;
+
+            cursor: pointer;
+
+            font-weight: bold;
+
+        }
+
+
+        .part-number-copy:hover {
+
+            background: #dbeafe;
+
+        }
+
+
+        .part-number-copy.copied {
+
+            background: #dcfce7;
+
+            color: #166534;
+
+        }
+
+
+        .copy-icon {
+
+            font-size: 13px;
+
+        }
+
+
+        .copy-hint {
+
+            margin-top: 10px;
+
+            color: #6b7280;
+
+            font-size: 13px;
+
+        }
+
+
+        /* ==================================================
+           DETAIL EMPTY
+        ================================================== */
+
+        .detail-empty {
+
+            padding: 20px;
+
+            text-align: center;
+
+            color: #6b7280;
+
+            background: white;
+
+            border: 1px solid #e5e7eb;
+
+            border-radius: 8px;
+
+        }
+
+
+        /* ==================================================
+           MOBILE
+        ================================================== */
+
+        @media (max-width: 700px) {
+
+            .admin-container {
+
+                margin: 10px;
+
+                padding: 10px;
+
+            }
+
+
+            .admin-header {
+
+                flex-direction: column;
+
+                align-items: flex-start;
+
+            }
+
+
+            .maris-form {
+
+                flex-direction: column;
+
+                align-items: stretch;
+
+            }
+
+
+            .maris-input {
+
+                width: 100%;
+
+            }
+
+
+            .maris-button {
+
+                width: 100%;
+
+            }
+
+
+            .ticket-detail {
+
+                padding: 12px;
+
+            }
+
+
+            .detail-table {
+
+                min-width: 650px;
+
+            }
+
+        }
+
+    
+        /* ==================================================
+           DARK MODE — CARI TICKET MARIS
+           Menyamakan panel pencarian dengan palette dark app
+        ================================================== */
+
+        html[data-theme="dark"] .maris-search-box {
+            background: #111827 !important;
+            border-color: #334155 !important;
+            box-shadow: 0 8px 24px rgba(0,0,0,.22) !important;
+            color: #e5e7eb !important;
+        }
+
+        html[data-theme="dark"] .maris-search-title {
+            color: #f8fafc !important;
+        }
+
+        html[data-theme="dark"] .maris-search-note {
+            color: #b8c5d6 !important;
+        }
+
+        html[data-theme="dark"] .maris-search-input {
+            background: #0b1220 !important;
+            color: #f1f5f9 !important;
+            border-color: #475569 !important;
+        }
+
+        html[data-theme="dark"] .maris-search-input::placeholder {
+            color: #7f91a8 !important;
+        }
+
+        html[data-theme="dark"] .maris-search-input:focus {
+            border-color: #3b82f6 !important;
+            box-shadow: 0 0 0 3px rgba(59,130,246,.16) !important;
+        }
+
+        html[data-theme="dark"] .maris-search-button {
+            background: #2563eb !important;
+            color: #ffffff !important;
+        }
+
+        html[data-theme="dark"] .maris-search-button:hover {
+            background: #3b82f6 !important;
+        }
+
+        html[data-theme="dark"] .maris-search-reset {
+            background: #1e293b !important;
+            color: #dbeafe !important;
+            border-color: #475569 !important;
+        }
+
+        html[data-theme="dark"] .maris-search-result {
+            background: #0f2742 !important;
+            border-color: #28598a !important;
+            color: #e5f1ff !important;
+        }
+
+        html[data-theme="dark"] .maris-search-result-title {
+            color: #93c5fd !important;
+        }
+
+        html[data-theme="dark"] .maris-search-info {
+            background: #111827 !important;
+            border-color: #334155 !important;
+        }
+
+        html[data-theme="dark"] .maris-search-info span {
+            color: #94a3b8 !important;
+        }
+
+        html[data-theme="dark"] .maris-search-info strong {
+            color: #f1f5f9 !important;
+        }
+
+        html[data-theme="dark"] .maris-search-message {
+            background: #3a1820 !important;
+            border-color: #7f3040 !important;
+            color: #fecdd3 !important;
+        }
+
+</style>
+
+<style>
+/* MARIS modern visual layer */
+body{margin:0;background:linear-gradient(135deg,#edf3f9 0%,#f8fbff 55%,#eef5fb 100%);color:#172033}.admin-container{max-width:1280px;margin:28px auto 52px;padding:0 20px}.admin-header{padding:25px 28px;border-radius:20px;background:linear-gradient(135deg,#173f68,#1e5f94);box-shadow:0 12px 32px rgba(23,63,104,.18);color:#fff}.admin-header h1{font-size:30px}.admin-header p,.admin-header p[style]{color:#d9eaff!important}.admin-header .back-button{background:rgba(255,255,255,.13);border:1px solid rgba(255,255,255,.28);backdrop-filter:blur(6px)}.summary-box{gap:16px}.summary-card{position:relative;overflow:hidden;border:1px solid #dce7f2!important;border-radius:17px!important;background:#fff!important;box-shadow:0 8px 24px rgba(15,23,42,.07);padding:20px!important}.summary-card:before{content:"";position:absolute;inset:0 auto 0 0;width:5px;background:#2563eb}.summary-card:nth-child(2):before{background:#16a34a}.summary-card .number{color:#174f7e!important;font-size:32px!important}.maris-search-box,.section{background:#fff!important;border:1px solid #dce7f2!important;border-radius:18px!important;box-shadow:0 8px 24px rgba(15,23,42,.06)!important}.section{padding:0 0 18px!important;overflow:hidden}.section>h2{margin:0!important;padding:17px 20px;background:#1e4f7b;color:#fff;font-size:17px}.section .table-wrapper{padding:0 14px 4px}.section table thead th{background:#eaf1f8!important;color:#24415f!important;border-bottom:1px solid #d6e1ec!important}.section table tbody tr:hover{background:#f6faff}.maris-input,.maris-search-input{border-radius:9px!important;border:1px solid #cbd8e6!important}.maris-button,.maris-search-button{border-radius:9px!important;background:#1d5d91!important}.ticket-toggle{color:#174f7e!important}.notification{border:1px solid transparent}.notification.success{border-color:#bbf7d0}.notification.error{border-color:#fecaca}html[data-theme="dark"] body{background:linear-gradient(135deg,#07111f 0%,#0c1728 55%,#0b1422 100%);color:#e5edf8}html[data-theme="dark"] .admin-header{background:linear-gradient(135deg,#102b49,#164f7d);box-shadow:0 14px 35px rgba(0,0,0,.3)}html[data-theme="dark"] .summary-card,html[data-theme="dark"] .maris-search-box,html[data-theme="dark"] .section{background:#111c2f!important;border-color:#263853!important;box-shadow:0 10px 28px rgba(0,0,0,.2)!important}html[data-theme="dark"] .summary-card .number{color:#7dd3fc!important}html[data-theme="dark"] .section>h2{background:#163c61;color:#f8fafc}html[data-theme="dark"] .section table thead th{background:#16253a!important;color:#c9d7e9!important;border-color:#31425f!important}html[data-theme="dark"] .section table tbody tr:hover{background:#142238}html[data-theme="dark"] .maris-input,html[data-theme="dark"] .maris-search-input{background:#0d1728!important;border-color:#31425f!important;color:#e5edf8!important}@media(max-width:700px){.admin-container{padding:0 12px}.admin-header{padding:20px;align-items:flex-start}.admin-header h1{font-size:25px}.summary-box{grid-template-columns:1fr!important}}
+</style>
+
+<style>
+.cutoff-summary-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px;margin:16px 0}.cutoff-summary-item{padding:16px;border:1px solid #dce7f2;border-radius:12px;background:#f8fbff;display:flex;flex-direction:column;gap:8px}.cutoff-summary-item span{font-size:13px;color:#64748b}.cutoff-summary-item strong{font-size:25px;color:#174f7e;overflow-wrap:anywhere}.cutoff-button{padding:12px 18px;border:0;color:#fff;cursor:pointer;font-weight:700}.cutoff-button:disabled{opacity:.45;cursor:not-allowed}html[data-theme="dark"] .cutoff-summary-item{background:#0d1728;border-color:#31425f}html[data-theme="dark"] .cutoff-summary-item span{color:#9fb0c7}html[data-theme="dark"] .cutoff-summary-item strong{color:#7dd3fc}@media(max-width:650px){.cutoff-summary-grid{grid-template-columns:1fr}}
+</style>
+
+</head>
+
+
+<body>
+
+{% include '_app_nav.html' %}
+
+
+
+<div class="admin-container">
+
+
+    <!-- ================================================= -->
+    <!-- HEADER -->
+    <!-- ================================================= -->
+
+    <div class="admin-header">
+
+        <div>
+
+            <p
+                style="
+                    margin:0;
+                    color:#6b7280;
+                    font-weight:bold;
+                "
+            >
+                CRUSHING APP
+            </p>
+
+
+            <h1>
+                Admin MARIS
+            </h1>
+
+
+            <p>
+                Input nomor transaksi MARIS
+                untuk ticket yang sudah Approved.
+            </p>
+
+        </div>
+
+
+        <div>
+
+            <a
+                href="/"
+                class="back-button"
+            >
+                ← Kembali
+            </a>
+
+        </div>
+
+    </div>
+
+
+    <!-- ================================================= -->
+    <!-- NOTIFICATION -->
+    <!-- ================================================= -->
+
+    {% if error_message %}
+
+    <div class="notification error">
+
+        ⚠️
+        {{ error_message }}
+
+    </div>
+
+    {% endif %}
+
+
+    {% if success_message %}
+
+    <div class="notification success">
+
+        ✓
+        {{ success_message }}
+
+    </div>
+
+    {% endif %}
+
+
+    <!-- ================================================= -->
+    <!-- SUMMARY -->
+    <!-- ================================================= -->
+
+    <div class="summary-box">
+
+
+        <div class="summary-card">
+
+            <div>
+                Menunggu Input MARIS
+            </div>
+
+            <div class="number">
+
+                {{ approved_tickets|length }}
+
+            </div>
+
+        </div>
+
+
+        <div class="summary-card">
+
+            <div>
+                Selesai MARIS
+            </div>
+
+            <div class="number">
+
+                {{ completed_tickets|length }}
+
+            </div>
+
+        </div>
+
+
+    </div>
+
+
+    <!-- ================================================= -->
+    <!-- CARI TICKET LAMA -->
+    <!-- ================================================= -->
+
+    <div class="maris-search-box">
+
+        <h2 class="maris-search-title">
+            🔎 Cari Ticket MARIS
+        </h2>
+
+        <p class="maris-search-note">
+            Gunakan fitur ini untuk mencari ticket lama yang masih
+            berstatus <strong>Approved</strong> tetapi belum diinput
+            nomor transaksi MARIS. Daftar utama tetap fokus pada
+            ticket hari ini.
+        </p>
+
+        <form
+            method="GET"
+            action="{{ url_for('admin_maris.admin_maris') }}"
+            class="maris-search-form"
+        >
+
+            <input
+                type="text"
+                name="search_ticket"
+                class="maris-search-input"
+                value="{{ search_ticket or '' }}"
+                placeholder="Contoh: CT-20260921-155558"
+                autocomplete="off"
+            >
+
+            <button
+                type="submit"
+                class="maris-search-button"
+            >
+                🔍 Cari
+            </button>
+
+            {% if search_ticket %}
+            <a
+                href="{{ url_for('admin_maris.admin_maris') }}"
+                class="maris-search-reset"
+            >
+                Reset
+            </a>
+            {% endif %}
+
+        </form>
+
+
+        {% if searched_ticket %}
+
+        <div class="maris-search-result">
+
+            <div class="maris-search-result-title">
+                ✓ Ticket ditemukan — masih menunggu transaksi MARIS
+            </div>
+
+            <div class="maris-search-result-grid">
+
+                <div class="maris-search-info">
+                    <span>Ticket</span>
+                    <strong>{{ searched_ticket.ticket_number }}</strong>
+                </div>
+
+                <div class="maris-search-info">
+                    <span>Line</span>
+                    <strong>{{ searched_ticket.line or "-" }}</strong>
+                </div>
+
+                <div class="maris-search-info">
+                    <span>Shift</span>
+                    <strong>{{ searched_ticket.shift or "-" }}</strong>
+                </div>
+
+                <div class="maris-search-info">
+                    <span>Remark</span>
+                    <strong>{{ searched_ticket.remarks or "-" }}</strong>
+                </div>
+
+                <div class="maris-search-info">
+                    <span>Approved</span>
+                    <strong>
+                        {% if searched_ticket.approved_at %}
+                            {{ searched_ticket.approved_at.strftime("%d-%m-%Y %H:%M") }}
+                        {% else %}
+                            -
+                        {% endif %}
+                    </strong>
+                </div>
+
+                <div class="maris-search-info">
+                    <span>Approved Oleh</span>
+                    <strong>{{ searched_ticket.approved_by or "-" }}</strong>
+                </div>
+
+                <div class="maris-search-info">
+                    <span>Status</span>
+                    <strong>Approved</strong>
+                </div>
+
+                <div class="maris-search-info">
+                    <span>Nomor MARIS</span>
+                    <strong>- Belum diinput</strong>
+                </div>
+
+            </div>
+
+            <form
+                method="POST"
+                class="maris-form"
+            >
+
+                <input
+                    type="hidden"
+                    name="action"
+                    value="save_maris"
+                >
+
+                <input
+                    type="hidden"
+                    name="ticket_id"
+                    value="{{ searched_ticket.id }}"
+                >
+
+                <input
+                    type="text"
+                    name="maris_transaction_number"
+                    class="maris-input"
+                    placeholder="Nomor transaksi MARIS"
+                    autocomplete="off"
+                    required
+                >
+
+                <button
+                    type="submit"
+                    class="maris-button"
+                >
+                    Simpan MARIS
+                </button>
+
+            </form>
+
+        </div>
+
+        {% elif search_message %}
+
+        <div class="maris-search-message">
+            ⚠️ {{ search_message }}
+        </div>
+
+        {% endif %}
+
+    </div>
+
+
+    <!-- ================================================= -->
+    <!-- TICKET MENUNGGU MARIS -->
+    <!-- ================================================= -->
+
+    <div class="section">
+
+        <h2>
+            Ticket Menunggu Input MARIS
+        </h2>
+
+
+        <div class="table-wrapper">
+
+            <table>
+
+                <thead>
+
+                    <tr>
+
+                        <th>
+                            No
+                        </th>
+
+                        <th>
+                            Ticket
+                        </th>
+
+                        <th>
+                            Line
+                        </th>
+
+                        <th>
+                            Shift
+                        </th>
+
+                        <th>
+                            Remark
+                        </th>
+
+                        <th>
+                            Approved
+                        </th>
+
+                        <th>
+                            Input Nomor MARIS
+                        </th>
+
+                    </tr>
+
+                </thead>
+
+
+                <tbody>
+
+                {% for ticket in approved_tickets %}
+
+
+                    <!-- ================================= -->
+                    <!-- BARIS TICKET -->
+                    <!-- ================================= -->
+
+                    <tr>
+
+                        <td>
+                            {{ loop.index }}
+                        </td>
+
+
+                        <td>
+
+                            <button
+                                type="button"
+                                class="ticket-toggle"
+                                onclick="toggleTicket(
+                                    'approved-{{ ticket.id }}',
+                                    this
+                                )"
+                            >
+
+                                {{ ticket.ticket_number }}
+
+                                <span class="ticket-arrow">
+                                    ▼
+                                </span>
+
+                            </button>
+
+                        </td>
+
+
+                        <td>
+                            {{ ticket.line }}
+                        </td>
+
+
+                        <td>
+                            {{ ticket.shift }}
+                        </td>
+
+
+                        <td>
+                            {{ ticket.remarks or "-" }}
+                        </td>
+
+
+                        <td>
+
+                            {% if ticket.approved_at %}
+
+                                {{ ticket.approved_at.strftime(
+                                    "%d-%m-%Y %H:%M"
+                                ) }}
+
+                            {% else %}
+
+                                -
+
+                            {% endif %}
+
+
+                            {% if ticket.approved_by %}
+
+                                <br>
+
+                                <small>
+
+                                    Oleh:
+                                    {{ ticket.approved_by }}
+
+                                </small>
+
+                            {% endif %}
+
+                        </td>
+
+
+                        <td>
+
+                            <form
+                                method="POST"
+                                class="maris-form"
+                            >
+
+                                <input
+                                    type="hidden"
+                                    name="action"
+                                    value="save_maris"
+                                >
+
+
+                                <input
+                                    type="hidden"
+                                    name="ticket_id"
+                                    value="{{ ticket.id }}"
+                                >
+
+
+                                <input
+                                    type="text"
+                                    name="maris_transaction_number"
+                                    class="maris-input"
+                                    placeholder="Nomor transaksi MARIS"
+                                    autocomplete="off"
+                                    required
+                                >
+
+
+                                <button
+                                    type="submit"
+                                    class="maris-button"
+                                >
+                                    Simpan
+                                </button>
+
+                            </form>
+
+                        </td>
+
+                    </tr>
+
+
+                    <!-- ================================= -->
+                    <!-- DETAIL TICKET -->
+                    <!-- ================================= -->
+
+                    <tr
+                        id="approved-{{ ticket.id }}"
+                        class="ticket-detail-row"
+                    >
+
+                        <td
+                            colspan="7"
+                        >
+
+                            <div class="ticket-detail">
+
+
+                                <div
+                                    class="ticket-detail-header"
+                                >
+
+                                    <div
+                                        class="ticket-detail-title"
+                                    >
+
+                                        Detail Ticket
+                                        {{ ticket.ticket_number }}
+
+                                    </div>
+
+                                    <button
+                                        type="button"
+                                        class="edit-ticket-button"
+                                        onclick="toggleEditTicket('approved-{{ ticket.id }}')"
+                                    >
+                                        ✎ Edit Ticket
+                                    </button>
+
+                                </div>
+
+                                <div id="edit-ticket-approved-{{ ticket.id }}" class="ticket-edit-panel" hidden>
+                                    <h3>Penyesuaian Ticket</h3>
+                                    <p class="ticket-edit-note">Gunakan hanya jika Qty aktual dan transaksi MARIS berbeda. Setiap perubahan membutuhkan password Admin Aplikasi.</p>
+                                    <form method="POST" action="{{ url_for('admin_maris.edit_ticket', ticket_id=ticket.id) }}" onsubmit="return confirm('Simpan perubahan ticket ini?');">
+                                        {% for item in ticket.transactions %}
+                                        <div class="edit-item-row">
+                                            <div><strong>{{ item.part_number }}</strong><br><small>{{ item.part_name }}</small></div>
+                                            <input class="edit-qty-input" type="number" name="quantity_{{ item.id }}" min="1" value="{{ item.quantity }}">
+                                            <label class="edit-delete-label"><input type="checkbox" name="delete_{{ item.id }}" value="1"> Hapus</label>
+                                        </div>
+                                        {% endfor %}
+                                        <div class="edit-password-row">
+                                            <input class="edit-password-input" type="password" name="admin_password" placeholder="Password Admin Aplikasi" autocomplete="current-password" required>
+                                            <button type="button" class="edit-cancel-button" onclick="toggleEditTicket('approved-{{ ticket.id }}')">Batal</button>
+                                            <button type="submit" class="edit-submit-button">Simpan Perubahan</button>
+                                        </div>
+                                    </form>
+                                </div>
+
+
+                                <!-- INFO -->
+
+                                <div
+                                    class="ticket-detail-info"
+                                >
+
+                                    <div
+                                        class="detail-badge"
+                                    >
+
+                                        <strong>
+                                            Line:
+                                        </strong>
+
+                                        {{ ticket.line }}
+
+                                    </div>
+
+
+                                    <div
+                                        class="detail-badge"
+                                    >
+
+                                        <strong>
+                                            Shift:
+                                        </strong>
+
+                                        {{ ticket.shift }}
+
+                                    </div>
+
+
+                                    <div
+                                        class="detail-badge"
+                                    >
+
+                                        <strong>
+                                            Remark:
+                                        </strong>
+
+                                        {{ ticket.remarks or "-" }}
+
+                                    </div>
+
+
+                                    <div
+                                        class="detail-badge"
+                                    >
+
+                                        <strong>
+                                            Jumlah Part:
+                                        </strong>
+
+                                        {{ ticket.transactions|length }}
+
+                                    </div>
+
+                                </div>
+
+
+                                <!-- DETAIL PART -->
+
+                                {% if ticket.transactions %}
+
+                                <div
+                                    style="
+                                        overflow-x:auto;
+                                    "
+                                >
+
+                                    <table
+                                        class="detail-table"
+                                    >
+
+                                        <thead>
+
+                                            <tr>
+
+                                                <th>
+                                                    No
+                                                </th>
+
+                                                <th>
+                                                    Part Number
+                                                </th>
+
+                                                <th>
+                                                    Part Name
+                                                </th>
+
+                                                <th>
+                                                    Jenis NG
+                                                </th>
+
+                                                <th>
+                                                    Qty
+                                                </th>
+
+                                            </tr>
+
+                                        </thead>
+
+
+                                        <tbody>
+
+                                        {% for item in ticket.transactions %}
+
+                                            <tr>
+
+                                                <td>
+                                                    {{ loop.index }}
+                                                </td>
+
+
+                                                <td>
+
+                                                    <button
+                                                        type="button"
+                                                        class="part-number-copy"
+                                                        onclick="copyPartNumber(
+                                                            this,
+                                                            '{{ item.part_number|e }}'
+                                                        )"
+                                                        title="Klik untuk copy Part Number"
+                                                    >
+
+                                                        <span>
+                                                            {{ item.part_number }}
+                                                        </span>
+
+                                                        <span
+                                                            class="copy-icon"
+                                                        >
+                                                            📋
+                                                        </span>
+
+                                                    </button>
+
+                                                </td>
+
+
+                                                <td>
+                                                    {{ item.part_name }}
+                                                </td>
+
+
+                                                <td>
+                                                    {{ item.jenis_ng or "-" }}
+                                                </td>
+
+
+                                                <td>
+                                                    <strong>
+                                                        {{ item.quantity }}
+                                                    </strong>
+                                                    PCS
+                                                </td>
+
+                                            </tr>
+
+                                        {% endfor %}
+
+                                        </tbody>
+
+                                    </table>
+
+                                </div>
+
+
+                                <div class="copy-hint">
+
+                                    💡 Klik
+                                    <strong>
+                                        Part Number
+                                    </strong>
+                                    untuk menyalinnya.
+                                    Proses input MARIS tetap dilakukan
+                                    satu Part Number setiap transaksi.
+
+                                </div>
+
+
+                                {% else %}
+
+                                <div class="detail-empty">
+
+                                    Tidak ada detail part
+                                    pada ticket ini.
+
+                                </div>
+
+                                {% endif %}
+
+                            </div>
+
+                        </td>
+
+                    </tr>
+
+
+                {% else %}
+
+
+                    <tr>
+
+                        <td
+                            colspan="7"
+                            class="empty-message"
+                        >
+
+                            ✓ Tidak ada ticket
+                            yang menunggu input MARIS.
+
+                        </td>
+
+                    </tr>
+
+
+                {% endfor %}
+
+                </tbody>
+
+            </table>
+
+        </div>
+
+    </div>
+
+
+    <!-- ================================================= -->
+    <!-- PENUTUPAN PERIODE MARIS -->
+    <!-- ================================================= -->
+    <div class="section cutoff-panel">
+        <h2>Penutupan Periode Transaksi MARIS</h2>
+        <div style="padding:20px;">
+            <p style="margin-top:0;">Tombol ini hanya menutup tiket yang sudah selesai diinput ke MARIS dan belum pernah masuk periode penutupan. Tiket yang belum selesai tetap berada di antrean.</p>
+            <div class="cutoff-summary-grid">
+                <div class="cutoff-summary-item"><span>Tiket selesai MARIS, belum ditutup</span><strong>{{ completed_tickets|length }}</strong></div>
+                <div class="cutoff-summary-item"><span>Total amount belum ditutup</span><strong>Rp {{ "{:,.0f}".format(unclosed_total_amount).replace(",", ".") }}</strong></div>
+            </div>
+            <form method="POST" action="{{ url_for('admin_maris.admin_maris') }}" onsubmit="return confirm('Tutup periode sekarang? Hanya tiket selesai MARIS yang belum pernah ditutup akan dimasukkan ke rekap. Tiket lain tetap di antrean.');">
+                <input type="hidden" name="action" value="close_period">
+                <button type="submit" class="maris-button cutoff-button" {% if not completed_tickets %}disabled title="Belum ada tiket yang memenuhi syarat"{% endif %}>✓ Selesai Transaksi Crushing Ticket</button>
+            </form>
+            <p style="font-size:12px;color:#64748b;margin-bottom:0;">Penutupan mencatat waktu, pengguna, daftar tiket, dan total amount. Data historis tidak dihapus.</p>
+        </div>
+    </div>
+
+    <div class="section cutoff-panel">
+        <h2>Riwayat Penutupan Periode</h2>
+        <div class="table-wrapper">
+            <table>
+                <thead><tr><th>No</th><th>ID Periode</th><th>Waktu Ditutup</th><th>Ditutup Oleh</th><th>Jumlah Tiket</th><th>Total Amount</th></tr></thead>
+                <tbody>
+                {% for period in closing_periods %}
+                    <tr><td>{{ loop.index }}</td><td><strong>{{ period.period_number }}</strong></td><td>{{ period.closed_at.strftime('%d-%m-%Y %H:%M:%S') if period.closed_at else '-' }}</td><td>{{ period.closed_by }}</td><td>{{ period.ticket_count }}</td><td>Rp {{ "{:,.0f}".format(period.total_amount or 0).replace(",", ".") }}</td></tr>
+                {% else %}
+                    <tr><td colspan="6" style="text-align:center;color:#64748b;padding:20px;">Belum ada periode yang ditutup.</td></tr>
+                {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- ================================================= -->
+    <!-- TICKET SELESAI MARIS -->
+    <!-- ================================================= -->
+
+    <div class="section">
+
+        <h2>
+            Riwayat MARIS
+        </h2>
+
+
+        <div class="table-wrapper">
+
+            <table>
+
+                <thead>
+
+                    <tr>
+
+                        <th>
+                            No
+                        </th>
+
+                        <th>
+                            Ticket
+                        </th>
+
+                        <th>
+                            Line
+                        </th>
+
+                        <th>
+                            Shift
+                        </th>
+
+                        <th>
+                            Remark
+                        </th>
+
+                        <th>
+                            Nomor Transaksi MARIS
+                        </th>
+
+                        <th>
+                            Input Oleh
+                        </th>
+
+                        <th>
+                            Waktu Input
+                        </th>
+
+                        <th>
+                            Status
+                        </th>
+
+                    </tr>
+
+                </thead>
+
+
+                <tbody>
+
+                {% for ticket in completed_tickets %}
+
+
+                    <!-- ================================= -->
+                    <!-- BARIS HISTORY -->
+                    <!-- ================================= -->
+
+                    <tr>
+
+                        <td>
+                            {{ loop.index }}
+                        </td>
+
+
+                        <td>
+
+                            <button
+                                type="button"
+                                class="ticket-toggle"
+                                onclick="toggleTicket(
+                                    'completed-{{ ticket.id }}',
+                                    this
+                                )"
+                            >
+
+                                {{ ticket.ticket_number }}
+
+                                <span class="ticket-arrow">
+                                    ▼
+                                </span>
+
+                            </button>
+
+                        </td>
+
+
+                        <td>
+                            {{ ticket.line }}
+                        </td>
+
+
+                        <td>
+                            {{ ticket.shift }}
+                        </td>
+
+
+                        <td>
+                            {{ ticket.remarks or "-" }}
+                        </td>
+
+
+                        <td>
+
+                            <strong>
+                                {{ ticket.maris_transaction_number }}
+                            </strong>
+
+                        </td>
+
+
+                        <td>
+                            {{ ticket.maris_input_by or "-" }}
+                        </td>
+
+
+                        <td>
+
+                            {% if ticket.maris_input_at %}
+
+                                {{ ticket.maris_input_at.strftime(
+                                    "%d-%m-%Y %H:%M"
+                                ) }}
+
+                            {% else %}
+
+                                -
+
+                            {% endif %}
+
+                        </td>
+
+
+                        <td>
+
+                            <span
+                                class="status status-completed"
+                            >
+
+                                MARIS Completed
+
+                            </span>
+
+                        </td>
+
+                    </tr>
+
+
+                    <!-- ================================= -->
+                    <!-- DETAIL HISTORY -->
+                    <!-- ================================= -->
+
+                    <tr
+                        id="completed-{{ ticket.id }}"
+                        class="ticket-detail-row"
+                    >
+
+                        <td
+                            colspan="9"
+                        >
+
+                            <div class="ticket-detail">
+
+
+                                <div
+                                    class="ticket-detail-header"
+                                >
+
+                                    <div
+                                        class="ticket-detail-title"
+                                    >
+
+                                        Detail Ticket
+                                        {{ ticket.ticket_number }}
+
+                                    </div>
+
+                                    <button type="button" class="edit-ticket-button" onclick="toggleEditTicket('{{ ticket.id }}')">✎ Edit Ticket</button>
+
+                                </div>
+
+                                <div id="edit-ticket-{{ ticket.id }}" class="ticket-edit-panel" hidden>
+                                    <h3>Penyesuaian Ticket</h3>
+                                    <p class="ticket-edit-note">Gunakan hanya jika Qty aktual dan transaksi MARIS berbeda. Setiap perubahan membutuhkan password Admin Aplikasi.</p>
+                                    <form method="POST" action="{{ url_for('admin_maris.edit_ticket', ticket_id=ticket.id) }}" onsubmit="return confirm('Simpan perubahan ticket ini?');">
+                                        {% for item in ticket.transactions %}
+                                        <div class="edit-item-row">
+                                            <div><strong>{{ item.part_number }}</strong><br><small>{{ item.part_name }}</small></div>
+                                            <input class="edit-qty-input" type="number" name="quantity_{{ item.id }}" min="1" value="{{ item.quantity }}">
+                                            <label class="edit-delete-label"><input type="checkbox" name="delete_{{ item.id }}" value="1"> Hapus</label>
+                                        </div>
+                                        {% endfor %}
+                                        <div class="edit-password-row">
+                                            <input class="edit-password-input" type="password" name="admin_password" placeholder="Password Admin Aplikasi" autocomplete="current-password" required>
+                                            <button type="button" class="edit-cancel-button" onclick="toggleEditTicket('{{ ticket.id }}')">Batal</button>
+                                            <button type="submit" class="edit-submit-button">Simpan Perubahan</button>
+                                        </div>
+                                    </form>
+                                </div>
+
+
+                                <!-- INFO -->
+
+                                <div
+                                    class="ticket-detail-info"
+                                >
+
+                                    <div
+                                        class="detail-badge"
+                                    >
+
+                                        <strong>
+                                            Line:
+                                        </strong>
+
+                                        {{ ticket.line }}
+
+                                    </div>
+
+
+                                    <div
+                                        class="detail-badge"
+                                    >
+
+                                        <strong>
+                                            Shift:
+                                        </strong>
+
+                                        {{ ticket.shift }}
+
+                                    </div>
+
+
+                                    <div
+                                        class="detail-badge"
+                                    >
+
+                                        <strong>
+                                            Remark:
+                                        </strong>
+
+                                        {{ ticket.remarks or "-" }}
+
+                                    </div>
+
+
+                                    <div
+                                        class="detail-badge"
+                                    >
+
+                                        <strong>
+                                            Nomor MARIS:
+                                        </strong>
+
+                                        {{ ticket.maris_transaction_number }}
+
+                                    </div>
+
+                                </div>
+
+
+                                <!-- DETAIL PART -->
+
+                                {% if ticket.transactions %}
+
+                                <div
+                                    style="
+                                        overflow-x:auto;
+                                    "
+                                >
+
+                                    <table
+                                        class="detail-table"
+                                    >
+
+                                        <thead>
+
+                                            <tr>
+
+                                                <th>
+                                                    No
+                                                </th>
+
+                                                <th>
+                                                    Part Number
+                                                </th>
+
+                                                <th>
+                                                    Part Name
+                                                </th>
+
+                                                <th>
+                                                    Jenis NG
+                                                </th>
+
+                                                <th>
+                                                    Qty
+                                                </th>
+
+                                            </tr>
+
+                                        </thead>
+
+
+                                        <tbody>
+
+                                        {% for item in ticket.transactions %}
+
+                                            <tr>
+
+                                                <td>
+                                                    {{ loop.index }}
+                                                </td>
+
+
+                                                <td>
+
+                                                    <button
+                                                        type="button"
+                                                        class="part-number-copy"
+                                                        onclick="copyPartNumber(
+                                                            this,
+                                                            '{{ item.part_number|e }}'
+                                                        )"
+                                                        title="Klik untuk copy Part Number"
+                                                    >
+
+                                                        <span>
+                                                            {{ item.part_number }}
+                                                        </span>
+
+                                                        <span
+                                                            class="copy-icon"
+                                                        >
+                                                            📋
+                                                        </span>
+
+                                                    </button>
+
+                                                </td>
+
+
+                                                <td>
+                                                    {{ item.part_name }}
+                                                </td>
+
+
+                                                <td>
+                                                    {{ item.jenis_ng or "-" }}
+                                                </td>
+
+
+                                                <td>
+
+                                                    <strong>
+                                                        {{ item.quantity }}
+                                                    </strong>
+
+                                                    PCS
+
+                                                </td>
+
+                                            </tr>
+
+                                        {% endfor %}
+
+                                        </tbody>
+
+                                    </table>
+
+                                </div>
+
+
+                                <div class="copy-hint">
+
+                                    💡 Klik
+                                    <strong>
+                                        Part Number
+                                    </strong>
+                                    untuk menyalinnya.
+
+                                </div>
+
+
+                                {% else %}
+
+                                <div class="detail-empty">
+
+                                    Tidak ada detail part
+                                    pada ticket ini.
+
+                                </div>
+
+                                {% endif %}
+
+                            </div>
+
+                        </td>
+
+                    </tr>
+
+
+                {% else %}
+
+
+                    <tr>
+
+                        <td
+                            colspan="9"
+                            class="empty-message"
+                        >
+
+                            Belum ada ticket
+                            yang selesai diproses MARIS.
+
+                        </td>
+
+                    </tr>
+
+
+                {% endfor %}
+
+                </tbody>
+
+            </table>
+
+        </div>
+
+    </div>
+
+
+</div>
+
+
+<!-- =====================================================
+     JAVASCRIPT
+===================================================== -->
+
+<script>
+
+
+/* =====================================================
+   EXPAND / COLLAPSE TICKET
+===================================================== */
+
+function toggleTicket(
+    detailId,
+    button
+) {
+
+    const detailRow =
+        document.getElementById(
+            detailId
+        );
+
+
+    if (!detailRow) {
+
+        return;
+
+    }
+
+
+    const isOpen =
+        detailRow.classList.contains(
+            "open"
+        );
+
+
+    /*
+     * Tutup semua detail ticket
+     * terlebih dahulu.
+     *
+     * Jadi hanya satu ticket yang
+     * terbuka pada satu waktu.
+     */
+
+    document
+        .querySelectorAll(
+            ".ticket-detail-row.open"
+        )
+        .forEach(
+            function(row) {
+
+                row.classList.remove(
+                    "open"
+                );
+
+            }
+        );
+
+
+    document
+        .querySelectorAll(
+            ".ticket-toggle.open"
+        )
+        .forEach(
+            function(btn) {
+
+                btn.classList.remove(
+                    "open"
+                );
+
+            }
+        );
+
+
+    /*
+     * Jika sebelumnya tertutup,
+     * buka ticket yang diklik.
+     *
+     * Jika sebelumnya terbuka,
+     * biarkan tertutup.
+     */
+
+    if (!isOpen) {
+
+        detailRow.classList.add(
+            "open"
+        );
+
+
+        button.classList.add(
+            "open"
+        );
+
+    }
+
+}
+
+
+/* =====================================================
+   COPY PART NUMBER
+===================================================== */
+
+async function copyPartNumber(
+    button,
+    partNumber
+) {
+
+    try {
+
+        /*
+         * Clipboard API modern
+         */
+
+        await navigator
+            .clipboard
+            .writeText(
+                partNumber
+            );
+
+
+        showCopiedState(
+            button
+        );
+
+
+    }
+
+    catch (error) {
+
+        /*
+         * Fallback untuk browser
+         * yang tidak mendukung Clipboard API.
+         */
+
+        const textArea =
+            document.createElement(
+                "textarea"
+            );
+
+
+        textArea.value =
+            partNumber;
+
+
+        textArea.style.position =
+            "fixed";
+
+        textArea.style.left =
+            "-9999px";
+
+
+        document
+            .body
+            .appendChild(
+                textArea
+            );
+
+
+        textArea
+            .focus();
+
+
+        textArea
+            .select();
+
+
+        try {
+
+            document.execCommand(
+                "copy"
+            );
+
+
+            showCopiedState(
+                button
+            );
+
+        }
+
+        catch (fallbackError) {
+
+            alert(
+                "Part Number gagal disalin. "
+                + "Silakan copy secara manual."
+            );
+
+        }
+
+
+        document
+            .body
+            .removeChild(
+                textArea
+            );
+
+    }
+
+}
+
+
+/* =====================================================
+   TAMPILKAN STATUS COPIED
+===================================================== */
+
+function showCopiedState(
+    button
+) {
+
+    const originalHTML =
+        button.innerHTML;
+
+
+    button.classList.add(
+        "copied"
+    );
+
+
+    button.innerHTML =
+        "✓ Copied";
+
+
+    setTimeout(
+        function() {
+
+            button.classList.remove(
+                "copied"
+            );
+
+
+            button.innerHTML =
+                originalHTML;
+
+        },
+        1200
+    );
+
+}
+
+
+</script>
+
+
+
+<script>
+function toggleEditTicket(id) {
+    const panel = document.getElementById('edit-ticket-' + id);
+    if (!panel) return;
+    panel.hidden = !panel.hidden;
+    if (!panel.hidden) {
+        const input = panel.querySelector('input[name="admin_password"]');
+        if (input) setTimeout(() => input.focus(), 50);
+    }
+}
+</script>
+
+</body>
+
+</html>

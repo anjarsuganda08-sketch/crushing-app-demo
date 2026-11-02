@@ -1,0 +1,370 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+
+<meta charset="UTF-8">
+
+<meta
+name="viewport"
+content="width=device-width, initial-scale=1.0">
+
+<title>
+
+Import Master Part
+
+</title>
+
+<link
+rel="stylesheet"
+href="{{ url_for('static', filename='css/style.css') }}">
+
+</head>
+
+<body class="page-production">
+
+{% include '_app_nav.html' %}
+
+
+<div class="production-shell">
+
+<div
+class="production-card"
+style="max-width:850px;">
+
+<!-- ====================================== -->
+<!-- HEADER -->
+<!-- ====================================== -->
+
+<div class="production-header">
+
+<div>
+
+<p class="eyebrow">
+
+Master Data
+
+</p>
+
+<h1>
+
+Import Master Part
+
+</h1>
+
+</div>
+
+<div class="badge">
+
+{{ current_user_role|upper }}
+
+</div>
+
+</div>
+
+<hr>
+
+<p style="color:#666;margin-bottom:25px;">
+
+Upload file Master Part terbaru dari Engineering.
+Sistem akan melakukan analisa terlebih dahulu sebelum data diubah.
+
+</p>
+
+
+<!-- ====================================== -->
+<!-- FLASH -->
+<!-- ====================================== -->
+
+{% with messages = get_flashed_messages() %}
+
+{% if messages %}
+
+<div
+style="
+background:#fff8e1;
+border-left:5px solid #fbc02d;
+padding:18px;
+margin-bottom:25px;
+border-radius:10px;
+">
+
+{% for msg in messages %}
+
+<div style="margin:5px 0;">
+
+{{ msg }}
+
+</div>
+
+{% endfor %}
+
+</div>
+
+{% endif %}
+
+{% endwith %}
+
+
+<!-- ====================================== -->
+<!-- MENU CEPAT -->
+<!-- ====================================== -->
+
+<div
+style="
+display:flex;
+gap:15px;
+flex-wrap:wrap;
+margin-bottom:25px;
+">
+
+<a
+href="{{ url_for('import_master.download_master') }}"
+class="open-btn">
+
+⬇ Download Master Part
+
+</a>
+
+<a
+href="/master-part"
+class="open-btn">
+
+📋 Lihat Master Part
+
+</a>
+
+<a
+href="/production"
+class="open-btn">
+
+← Kembali Produksi
+
+</a>
+
+</div>
+
+
+<hr>
+
+
+<!-- ====================================== -->
+<!-- IMPORT -->
+<!-- ====================================== -->
+
+<h2>
+
+Upload File Excel
+
+</h2>
+
+<form
+method="POST"
+enctype="multipart/form-data">
+
+<div class="field">
+
+<label>
+
+Pilih File Excel
+
+</label>
+
+<input
+type="file"
+name="excel"
+accept=".xlsx,.xls"
+required>
+
+</div>
+
+<br>
+
+<button type="submit">
+
+🔍 Analisa File
+
+</button>
+
+</form>
+
+
+<!-- ====================================== -->
+<!-- PREVIEW -->
+<!-- ====================================== -->
+
+{% if preview %}
+
+<hr>
+
+<h2>
+
+Hasil Analisa
+
+</h2>
+
+<div class="summary-grid">
+
+<div class="summary-card">
+
+<h3>
+
+{{ preview.filename }}
+
+</h3>
+
+<p>
+
+Nama File
+
+</p>
+
+</div>
+
+<div class="summary-card">
+
+<h3>
+
+{{ preview.total }}
+
+</h3>
+
+<p>
+
+Total Excel
+
+</p>
+
+</div>
+
+<div class="summary-card">
+
+<h3>
+
+{{ preview.new }}
+
+</h3>
+
+<p>
+
+Part Baru
+
+</p>
+
+</div>
+
+<div class="summary-card">
+
+<h3>
+
+{{ preview["update"] }}
+
+</h3>
+
+<p>
+
+Update
+
+</p>
+
+</div>
+
+<div class="summary-card">
+
+<h3>
+
+{{ preview.error }}
+
+</h3>
+
+<p>
+
+Error
+
+</p>
+
+</div>
+
+</div>
+
+<br>
+
+{% if preview.error == 0 %}
+
+<div
+style="
+padding:15px;
+background:#e8f5e9;
+border-left:5px solid #4caf50;
+border-radius:10px;
+margin-bottom:20px;
+">
+
+✅ File siap diimport.
+
+</div>
+
+<form
+action="{{ url_for('import_master.import_database') }}"
+method="POST">
+
+<button
+type="submit"
+style="
+background:#16a34a;
+">
+
+⬇ Import Sekarang
+
+</button>
+
+</form>
+
+{% else %}
+
+<div
+style="
+padding:18px;
+background:#ffebee;
+border-left:5px solid #ef5350;
+border-radius:10px;
+font-weight:bold;
+color:#c62828;
+">
+
+Masih terdapat error pada file Excel.
+Import tidak dapat dilanjutkan.
+
+</div>
+
+{% endif %}
+
+{% endif %}
+
+
+<hr style="margin-top:40px;">
+
+<div
+style="
+font-size:13px;
+color:#777;
+text-align:center;
+">
+
+Crushing App • Master Part Management
+
+</div>
+
+</div>
+
+</div>
+
+
+<footer class="app-footer">
+    <strong>Crushing App by: Anjar S</strong>
+    <span>NG Material Control · © 2026</span>
+</footer>
+
+</body>
+
+</html>

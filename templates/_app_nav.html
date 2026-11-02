@@ -1,0 +1,100 @@
+{% if logged_in %}
+<header class="app-topbar">
+    <a class="app-brand" href="{{ url_for('dashboard.dashboard') }}" aria-label="Crushing App Dashboard">
+        <div class="app-brand-mark"><img src="{{ url_for('static', filename='img/crushing-monogram.svg') }}" alt="" aria-hidden="true"></div>
+        <div>
+            <strong>Crushing App</strong>
+            <span>NG Material Control</span>
+        </div>
+    </a>
+
+    <nav class="app-nav" aria-label="Navigasi utama">
+        {# Demo Admin: seluruh navigasi tersedia dalam satu sesi demo.
+           Ini hanya tampilan navigasi; endpoint mutasi sensitif tetap perlu perlindungan backend. #}
+        <a class="{% if request.endpoint == 'dashboard.dashboard' %}active{% endif %}" href="{{ url_for('dashboard.dashboard') }}">Dashboard</a>
+        <a class="{% if request.endpoint and request.endpoint.startswith('production.') %}active{% endif %}" href="{{ url_for('production.production') }}">Production</a>
+        <a class="app-nav-notified {% if request.endpoint and request.endpoint.startswith('pulling.') %}active{% endif %}" href="{{ url_for('pulling.pulling') }}">Pulling <span class="nav-badge" data-badge="pulling" hidden>0</span></a>
+        <a class="app-nav-notified {% if request.endpoint and request.endpoint.startswith(('monitoring.', 'detailticket.')) %}active{% endif %}" href="{{ url_for('monitoring.monitoring') }}">Monitoring <span class="nav-badge" data-badge="leader" hidden>0</span></a>
+        <a class="app-nav-notified {% if request.endpoint and request.endpoint.startswith('admin_maris.') %}active{% endif %}" href="{{ url_for('admin_maris.admin_maris') }}">MARIS <span class="nav-badge" data-badge="maris" hidden>0</span></a>
+        <a class="{% if request.endpoint and request.endpoint.startswith('import_members.') %}active{% endif %}" href="{{ url_for('import_members.import_members') }}">Member Import</a>
+        <a class="{% if request.endpoint and request.endpoint.startswith('import_master.') %}active{% endif %}" href="{{ url_for('import_master.import_master') }}">Master Import</a>
+        <a class="{% if request.endpoint and request.endpoint.startswith('export_crushing.') %}active{% endif %}" href="{{ url_for('export_crushing.export_crushing') }}">Export</a>
+        <a class="{% if request.endpoint == 'master_part' %}active{% endif %}" href="{{ url_for('master_part') }}">Master Part</a>
+    </nav>
+
+    <div class="app-user-menu">
+        <button type="button" class="theme-toggle" id="themeToggle" title="Ganti tema">☾</button>
+        <div class="app-user-info">
+            <strong>{{ current_user.nickname or current_user.full_name }}</strong>
+            <span>{{ current_user.npk }} · {{ current_user_role|upper }}</span>
+        </div>
+        <a class="app-logout" href="{{ url_for('auth.logout') }}" title="Logout">Keluar</a>
+    </div>
+</header>
+{% endif %}
+
+<style>
+.app-nav .app-nav-notified { display:inline-flex; align-items:center; gap:6px; }
+.app-nav .nav-badge { min-width:18px; height:18px; padding:0 5px; border-radius:999px; background:#e53935; color:#fff; font-size:11px; font-weight:800; line-height:18px; text-align:center; box-sizing:border-box; box-shadow:0 1px 3px rgba(0,0,0,.18); }
+.app-nav .nav-badge[hidden] { display:none !important; }
+</style>
+<script>
+(function () {
+    const badgeUrl = "{{ url_for('demo_notification_counts') }}";
+    async function refreshDemoBadges() {
+        try {
+            const response = await fetch(badgeUrl, { credentials: 'same-origin', cache: 'no-store' });
+            if (!response.ok) return;
+            const counts = await response.json();
+            document.querySelectorAll('[data-badge]').forEach(function (badge) {
+                const value = Number(counts[badge.dataset.badge] || 0);
+                badge.textContent = value > 99 ? '99+' : String(value);
+                badge.hidden = value <= 0;
+                const label = badge.dataset.badge === 'leader' ? 'tiket menunggu konfirmasi Leader' : (badge.dataset.badge === 'maris' ? 'tiket menunggu proses MARIS' : 'tiket menunggu Pulling');
+                badge.setAttribute('aria-label', value + ' ' + label);
+            });
+        } catch (error) { /* Tetap gunakan angka terakhir jika koneksi sementara gagal. */ }
+    }
+    refreshDemoBadges();
+    window.setInterval(refreshDemoBadges, 12000);
+    window.addEventListener('focus', refreshDemoBadges);
+})();
+</script>
+
+<script>
+(function () {
+    const key = "crushing-theme";
+    const root = document.documentElement;
+    const saved = localStorage.getItem(key) || "light";
+
+    function applyTheme(theme) {
+        if (theme === "dark") {
+            root.setAttribute("data-theme", "dark");
+        } else {
+            root.removeAttribute("data-theme");
+        }
+        localStorage.setItem(key, theme);
+
+        const btn = document.getElementById("themeToggle");
+        if (btn) {
+            btn.textContent = theme === "dark" ? "☀" : "☾";
+            btn.setAttribute("aria-label", theme === "dark" ? "Gunakan light mode" : "Gunakan dark mode");
+            btn.setAttribute("title", theme === "dark" ? "Ganti ke Light Mode" : "Ganti ke Dark Mode");
+        }
+
+        window.dispatchEvent(new CustomEvent("crushing-theme-change", {
+            detail: { theme: theme }
+        }));
+    }
+
+    applyTheme(saved);
+
+    const btn = document.getElementById("themeToggle");
+    if (!btn) return;
+
+    btn.addEventListener("click", function () {
+        const current = root.getAttribute("data-theme") === "dark" ? "dark" : "light";
+        applyTheme(current === "dark" ? "light" : "dark");
+    });
+})();
+</script>

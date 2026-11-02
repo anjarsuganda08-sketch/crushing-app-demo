@@ -1,0 +1,253 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Need Leader</title>
+<link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+
+<style>
+/* =====================================================
+   NEED LEADER — DARK MODE
+===================================================== */
+
+html[data-theme="dark"] .need-leader-ticket-info {
+    background:#111827 !important;
+    border:1px solid #334155 !important;
+    color:#f1f5f9 !important;
+    box-shadow:0 8px 24px rgba(0,0,0,.16);
+}
+
+html[data-theme="dark"] .need-leader-ticket-info h3 {
+    color:#f8fafc !important;
+}
+
+html[data-theme="dark"] .need-leader-ticket-info p {
+    color:#cbd5e1 !important;
+}
+
+html[data-theme="dark"] .need-leader-ticket-info b {
+    color:#93c5fd !important;
+}
+
+html[data-theme="dark"] .need-leader-error {
+    background:#351820 !important;
+    color:#fecdd3 !important;
+    border:1px solid #7f3040 !important;
+}
+
+html[data-theme="dark"] .need-leader-reason label {
+    color:#f1f5f9 !important;
+}
+
+html[data-theme="dark"] .need-leader-reason select {
+    background:#0b1220 !important;
+    color:#f1f5f9 !important;
+    border-color:#475569 !important;
+}
+
+html[data-theme="dark"] .need-leader-reason select:focus {
+    border-color:#3b82f6 !important;
+    outline:none !important;
+    box-shadow:0 0 0 3px rgba(59,130,246,.16) !important;
+}
+
+html[data-theme="dark"] .need-leader-reason select option {
+    background:#0b1220 !important;
+    color:#f1f5f9 !important;
+}
+
+html[data-theme="dark"] .need-leader-submit {
+    background:#f59e0b !important;
+    color:#fff !important;
+}
+
+html[data-theme="dark"] .need-leader-submit:hover {
+    background:#fbbf24 !important;
+}
+
+html[data-theme="dark"] .need-leader-back {
+    background:#2563eb !important;
+    color:#fff !important;
+}
+
+html[data-theme="dark"] .need-leader-back:hover {
+    background:#3b82f6 !important;
+}
+
+@media (max-width:600px) {
+    html[data-theme="dark"] .production-card {
+        margin-left:12px !important;
+        margin-right:12px !important;
+    }
+
+    html[data-theme="dark"] .need-leader-ticket-info {
+        padding:16px !important;
+    }
+
+    html[data-theme="dark"] .need-leader-ticket-info h3 {
+        font-size:18px;
+        word-break:break-word;
+    }
+}
+</style>
+</head>
+
+<body class="page-production">
+
+{% include '_app_nav.html' %}
+
+<div class="production-shell">
+    <div class="production-card" style="max-width:700px;">
+
+        <div class="production-header">
+            <div>
+                <p class="eyebrow">Crushing Ticket</p>
+                <h1>Need Leader</h1>
+            </div>
+            <div class="badge">Pulling</div>
+        </div>
+
+        <hr>
+
+        <div
+            class="need-leader-ticket-info"
+            style="
+                background:#f3f6fa;
+                padding:18px;
+                border-radius:12px;
+                margin-bottom:20px;
+            "
+        >
+            <h3 style="margin-top:0;">
+                {{ ticket.ticket_number }}
+            </h3>
+
+            <p>
+                <b>Line:</b>
+                {{ ticket.line }}
+            </p>
+
+            <p>
+                <b>Shift:</b>
+                {{ ticket.shift }}
+            </p>
+        </div>
+
+        {% if error %}
+        <div
+            class="need-leader-error"
+            style="
+                background:#ffebee;
+                color:#c62828;
+                padding:15px;
+                border-radius:10px;
+                margin-bottom:20px;
+                font-weight:bold;
+            "
+        >
+            {{ error }}
+        </div>
+        {% endif %}
+
+        <form
+            method="POST"
+            action="{{ url_for(
+                'detailticket.need_leader',
+                ticket_number=ticket.ticket_number
+            ) }}"
+        >
+
+            <div class="field need-leader-reason">
+                <label>
+                    <b>Alasan Need Leader</b>
+                </label>
+
+                <select
+                    name="reason"
+                    required
+                    style="
+                        width:100%;
+                        padding:12px;
+                        font-size:16px;
+                        border-radius:10px;
+                        border:1px solid #ccc;
+                        background:white;
+                        margin-top:8px;
+                    "
+                >
+                    <option value="" selected disabled>
+                        -- Pilih Alasan Problem --
+                    </option>
+
+                    <option value="Part Tidak Ditemukan Di Box Merah">
+                        Part Tidak Ditemukan Di Box Merah
+                    </option>
+
+                    <option value="Part Number Tidak Sesuai">
+                        Part Number Tidak Sesuai
+                    </option>
+
+                    <option value="Quantity Tidak Sesuai">
+                        Quantity Tidak Sesuai
+                    </option>
+
+                    <option value="Part Tidak Sesuai Dengan Foto">
+                        Part Tidak Sesuai Dengan Foto
+                    </option>
+
+                    <option value="Problem Lainnya">
+                        Problem Lainnya
+                    </option>
+                </select>
+            </div>
+
+            <button
+                type="submit"
+                class="need-leader-submit"
+                style="
+                    width:100%;
+                    background:#e58a00;
+                    color:white;
+                    padding:13px;
+                    margin-top:30px;
+                    border:none;
+                    border-radius:10px;
+                    font-size:16px;
+                    font-weight:bold;
+                    cursor:pointer;
+                "
+            >
+                ⚠ KIRIM KE LEADER
+            </button>
+
+        </form>
+
+        <a
+            href="{{ url_for('pulling.pulling') }}"
+            class="need-leader-back"
+            style="
+                display:block;
+                text-align:center;
+                background:#2563eb;
+                color:white;
+                padding:13px;
+                margin-top:20px;
+                border-radius:10px;
+                text-decoration:none;
+                font-weight:bold;
+            "
+        >
+            ← Kembali ke Pulling
+        </a>
+
+    </div>
+</div>
+
+<footer class="app-footer">
+    <strong>Crushing App by: Anjar S</strong>
+    <span>NG Material Control · © 2026</span>
+</footer>
+
+</body>
+</html>

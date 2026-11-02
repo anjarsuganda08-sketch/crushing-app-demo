@@ -1,0 +1,363 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+
+<meta charset="UTF-8">
+
+<meta name="viewport"
+content="width=device-width, initial-scale=1.0">
+
+<title>Upload Foto Part</title>
+
+<link
+rel="stylesheet"
+href="{{ url_for('static', filename='css/style.css') }}">
+
+<style>
+
+.preview-photo{
+
+    width:100%;
+    max-width:320px;
+    margin:auto;
+    display:none;
+    border-radius:12px;
+    border:1px solid #ddd;
+    object-fit:contain;
+    background:#fafafa;
+
+}
+
+.upload-buttons{
+
+    display:flex;
+    gap:10px;
+    margin-top:15px;
+    flex-wrap:wrap;
+
+}
+
+.upload-buttons label{
+
+    flex:1;
+    text-align:center;
+    background:#2563eb;
+    color:white;
+    padding:12px;
+    border-radius:10px;
+    cursor:pointer;
+    font-weight:bold;
+
+}
+
+.upload-buttons label:hover{
+
+    background:#1d4ed8;
+
+}
+
+input[type=file]{
+
+    display:none;
+
+}
+
+.save-btn{
+
+    width:100%;
+    margin-top:20px;
+    background:#16a34a;
+    color:white;
+    border:none;
+    padding:14px;
+    border-radius:10px;
+    font-size:16px;
+    font-weight:bold;
+    cursor:pointer;
+
+}
+
+.save-btn:hover{
+
+    background:#15803d;
+
+}
+
+</style>
+
+</head>
+
+<body class="page-production">
+
+{% include '_app_nav.html' %}
+
+
+<div class="production-shell">
+
+<div class="production-card" style="max-width:650px;">
+
+<h1 style="margin-bottom:5px;">
+
+Upload Foto Part
+
+</h1>
+
+<p style="color:#666;">
+
+Ambil foto langsung dari kamera atau pilih dari galeri.
+
+</p>
+
+<hr>
+
+<div style="margin:25px 0;">
+
+<label>Part Name</label>
+
+<div class="part-number">
+
+{{ part.part_name }}
+
+</div>
+
+</div>
+
+<div style="margin:25px 0;">
+
+<label>Part Number</label>
+
+<div class="part-number">
+
+{{ part.part_number }}
+
+</div>
+
+</div>
+
+<div style="text-align:center;margin:25px 0;">
+
+{% if part.photo %}
+
+<img
+
+src="{{ url_for('static',
+filename='part/' + part.photo) }}"
+
+class="part-photo"
+
+id="current-photo"
+
+>
+
+{% else %}
+
+<div
+
+class="photo-placeholder"
+
+id="photo-placeholder">
+
+<div class="icon">
+
+📦
+
+</div>
+
+<div class="text">
+
+Belum Ada Foto
+
+</div>
+
+</div>
+
+{% endif %}
+
+</div>
+
+<hr>
+
+<h3 style="margin-top:20px;">
+
+Preview Foto
+
+</h3>
+
+<div style="text-align:center;">
+
+<img
+id="preview-image"
+class="preview-photo">
+
+</div>
+
+<form
+
+method="POST"
+
+enctype="multipart/form-data"
+
+id="upload-form">
+
+<div class="upload-buttons">
+
+<label for="camera-input">
+
+📷 Ambil Foto
+
+</label>
+
+<label for="gallery-input">
+
+🖼 Pilih Galeri
+
+</label>
+
+</div>
+
+<input
+
+type="file"
+
+name="photo"
+
+id="camera-input"
+
+accept="image/*"
+
+capture="environment"
+
+>
+
+<input
+
+type="file"
+
+accept="image/*"
+
+id="gallery-input"
+
+>
+
+<button
+
+type="submit"
+
+class="save-btn">
+
+💾 Simpan Foto
+
+</button>
+
+</form>
+
+<br>
+
+<a
+
+href="/production"
+
+style="
+
+text-decoration:none;
+
+color:#2563eb;
+
+font-weight:bold;">
+
+← Kembali ke Produksi
+
+</a>
+
+</div>
+
+</div>
+
+<script>
+
+const preview=document.getElementById("preview-image");
+
+const currentPhoto=document.getElementById("current-photo");
+
+const placeholder=document.getElementById("photo-placeholder");
+
+const camera=document.getElementById("camera-input");
+
+const gallery=document.getElementById("gallery-input");
+
+function previewImage(file){
+
+    if(!file){
+
+        return;
+
+    }
+
+    const reader=new FileReader();
+
+    reader.onload=function(e){
+
+        preview.src=e.target.result;
+
+        preview.style.display="block";
+
+        if(currentPhoto){
+
+            currentPhoto.style.display="none";
+
+        }
+
+        if(placeholder){
+
+            placeholder.style.display="none";
+
+        }
+
+    }
+
+    reader.readAsDataURL(file);
+
+}
+
+camera.addEventListener(
+
+"change",
+
+function(){
+
+    previewImage(this.files[0]);
+
+}
+
+);
+
+gallery.addEventListener(
+
+"change",
+
+function(){
+
+    if(this.files.length){
+
+        camera.files=this.files;
+
+        previewImage(this.files[0]);
+
+    }
+
+}
+
+);
+
+</script>
+
+
+<footer class="app-footer">
+    <strong>Crushing App by: Anjar S</strong>
+    <span>NG Material Control · © 2026</span>
+</footer>
+
+</body>
+
+</html>

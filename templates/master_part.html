@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Master Part — Crushing App</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body class="master-page">
+{% include '_app_nav.html' %}
+
+<main class="master-container">
+    <section class="master-hero">
+        <div>
+            <p class="eyebrow">MASTER DATA</p>
+            <h1>Master Part</h1>
+            <p>Referensi part yang digunakan pada proses Crushing Validation.</p>
+        </div>
+        <div class="master-stat">
+            <strong>{{ parts|length }}</strong>
+            <span>Total Part</span>
+        </div>
+    </section>
+
+    <section class="master-card">
+        <div class="master-toolbar">
+            <div>
+                <h2>Daftar Master Part</h2>
+                <p>Gunakan pencarian untuk menemukan part dengan cepat.</p>
+            </div>
+            <div class="master-filter-tools">
+                <select id="lineFilter" class="search-box master-filter"><option value="">Semua Line</option></select>
+                <select id="modelFilter" class="search-box master-filter"><option value="">Semua Model</option></select>
+                <input type="search" id="masterSearch" class="search-box master-search" placeholder="Cari SKU, part number, atau nama part..." autocomplete="off">
+            </div>
+        </div>
+
+        <div class="table-scroll">
+            <table class="table-modern master-table" id="masterTable">
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Line</th>
+                        <th>Model</th>
+                        <th>Part Number</th>
+                        <th>SKU (Child)</th>
+                        <th>Qty (Child)</th>
+                        <th>Part Name</th>
+                        <th>Return Location</th>
+                        <th>Harga</th>
+                        <th>Foto</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for part in parts %}
+                    <tr data-line="{{ part.line|e }}" data-model="{{ part.model|e }}">
+                        <td>{{ part.id }}</td>
+                        <td><span class="data-chip">{{ part.line }}</span></td>
+                        <td>{{ part.model }}</td>
+                        <td><strong>{{ part.part_number }}</strong></td>
+                        <td>{{ part.sku or '—' }}</td>
+                        <td>{{ part.qty_child or 1 }}</td>
+                        <td>{{ part.part_name }}</td>
+                        <td>{{ part.return_location or '-' }}</td>
+                        <td>Rp {{ '{:,.0f}'.format(part.price or 0).replace(',', '.') }}</td>
+                        <td>
+                            {% if part.photo %}
+                            <span class="photo-status available">✓ Ada</span>
+                            {% else %}
+                            <span class="photo-status">— Belum</span>
+                            {% endif %}
+                        </td>
+                    </tr>
+                    {% else %}
+                    <tr><td colspan="10" class="empty-table">Belum ada data Master Part.</td></tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </section>
+</main>
+
+<script>
+const search = document.getElementById('masterSearch');
+const lineFilter = document.getElementById('lineFilter');
+const modelFilter = document.getElementById('modelFilter');
+const rows = [...document.querySelectorAll('#masterTable tbody tr[data-line]')];
+const unique = values => [...new Set(values.filter(Boolean))].sort((a,b)=>a.localeCompare(b, undefined, {numeric:true}));
+function fill(select, values, label){ const current=select.value; select.innerHTML=`<option value="">Semua ${label}</option>`; values.forEach(v=>select.add(new Option(v,v))); if(values.includes(current))select.value=current; }
+fill(lineFilter, unique(rows.map(r=>r.dataset.line)), 'Line');
+function refreshModels(){ const line=lineFilter.value; fill(modelFilter, unique(rows.filter(r=>!line||r.dataset.line===line).map(r=>r.dataset.model)), 'Model'); }
+function applyFilters(){ const q=search.value.trim().toLowerCase(), line=lineFilter.value, model=modelFilter.value; rows.forEach(row=>{ const show=(!line||row.dataset.line===line)&&(!model||row.dataset.model===model)&&(!q||row.textContent.toLowerCase().includes(q)); row.style.display=show?'':'none'; }); }
+lineFilter.addEventListener('change',()=>{refreshModels();applyFilters();}); modelFilter.addEventListener('change',applyFilters); search.addEventListener('input',applyFilters); refreshModels();
+</script>
+
+<footer class="app-footer">
+    <strong>Crushing App by: Anjar S</strong>
+    <span>NG Material Control · © 2026</span>
+</footer>
+
+</body>
+</html>

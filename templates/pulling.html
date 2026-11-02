@@ -1,0 +1,693 @@
+<!DOCTYPE html>
+<html lang="id">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <title>Operator Pulling</title>
+
+    <link
+        rel="stylesheet"
+        href="{{ url_for(
+            'static',
+            filename='css/style.css'
+        ) }}"
+    >
+
+</head>
+
+
+<body class="page-production">
+
+{% include '_app_nav.html' %}
+
+
+
+<div class="production-shell">
+
+<div class="production-card">
+
+
+<!-- ====================================== -->
+<!-- HEADER -->
+<!-- ====================================== -->
+
+<div class="production-header">
+
+    <div>
+
+        <p class="eyebrow">
+            Crushing App
+        </p>
+
+        <h1>
+            Member Pulling
+        </h1>
+
+    </div>
+
+
+    <div class="badge">
+        Ticket Validation
+    </div>
+
+</div>
+
+
+<div class="pulling-download-bar">
+    <div>
+        <strong>List Pulling Hari Ini</strong>
+        <span>Download ticket yang sudah selesai dipulling hari ini.</span>
+    </div>
+    <a href="{{ url_for('pulling.download_today') }}" class="download-pulling-btn">⬇ Download Excel</a>
+</div>
+
+
+<!-- ====================================== -->
+<!-- FILTER -->
+<!-- ====================================== -->
+
+<form
+    method="GET"
+    action="{{ url_for('pulling.pulling') }}"
+    class="production-form"
+>
+
+
+    <!-- LINE -->
+
+    <div class="field">
+
+        <label>
+            Line
+        </label>
+
+
+        <select
+            name="line"
+        >
+
+            <option value="">
+                Semua Line
+            </option>
+
+
+            {% for line in lines %}
+
+            <option
+                value="{{ line.line }}"
+                {% if selected_line == line.line %}
+                    selected
+                {% endif %}
+            >
+
+                {{ line.line }}
+
+            </option>
+
+            {% endfor %}
+
+        </select>
+
+    </div>
+
+
+    <!-- STATUS -->
+
+    <div class="field">
+
+        <label>
+            Status
+        </label>
+
+
+        <select
+            name="status"
+        >
+
+
+            <!-- PENDING PULLING -->
+
+            <option
+                value="Pending Pulling"
+                {% if selected_status == "Pending Pulling" %}
+                    selected
+                {% endif %}
+            >
+
+                Pending Pulling
+
+            </option>
+
+
+            <!-- NEED LEADER -->
+
+            <option
+                value="Need Leader Confirmation"
+                {% if selected_status == "Need Leader Confirmation" %}
+                    selected
+                {% endif %}
+            >
+
+                Need Leader
+
+            </option>
+
+
+            <!-- APPROVED -->
+
+            <option
+                value="Approved"
+                {% if selected_status == "Approved" %}
+                    selected
+                {% endif %}
+            >
+
+                Approved
+
+            </option>
+
+
+            <!-- ALL -->
+
+            <option
+                value="All"
+                {% if selected_status == "All" %}
+                    selected
+                {% endif %}
+            >
+
+                Semua
+
+            </option>
+
+
+        </select>
+
+    </div>
+
+
+    <!-- SEARCH -->
+
+    <div class="field">
+
+        <label>
+            Cari Ticket
+        </label>
+
+
+        <input
+            type="text"
+            name="search"
+            value="{{ search or '' }}"
+            placeholder="CT-2026..."
+        >
+
+    </div>
+
+
+    <!-- BUTTON -->
+
+    <div class="filter-button">
+
+    <button type="submit">
+        Cari
+    </button>
+
+    <a
+    href="{{ url_for('pulling.pulling') }}"
+    class="open-btn"
+>
+    Refresh
+</a>
+
+</div>
+
+
+</form>
+
+
+<hr style="margin:20px 0;">
+
+
+<!-- ====================================== -->
+<!-- SUMMARY -->
+<!-- ====================================== -->
+
+<div class="summary-grid">
+
+
+    <!-- PENDING -->
+
+    <div class="summary-card summary-card-pending">
+        <div class="summary-icon">◷</div>
+        <div class="summary-value">
+
+            {{ pending_count }}
+
+        </div>
+
+        <div class="summary-title">
+
+            Pending Pulling
+
+        </div>
+
+    </div>
+
+
+    <!-- NEED LEADER -->
+
+    <div class="summary-card summary-card-leader">
+        <div class="summary-icon">!</div>
+        <div class="summary-value">
+
+            {{ leader_count }}
+
+        </div>
+
+        <div class="summary-title">
+
+            Need Leader
+
+        </div>
+
+    </div>
+
+
+    <!-- APPROVED -->
+
+    <div class="summary-card summary-card-approved">
+        <div class="summary-icon">✓</div>
+        <div class="summary-value">
+
+            {{ approved_count }}
+
+        </div>
+
+        <div class="summary-title">
+
+            Approved
+
+        </div>
+
+    </div>
+
+
+    <!-- TOTAL -->
+
+    <div class="summary-card summary-card-total">
+        <div class="summary-icon">Σ</div>
+        <div class="summary-value">
+
+            {{ total_ticket }}
+
+        </div>
+
+        <div class="summary-title">
+
+            Total
+
+        </div>
+
+    </div>
+
+
+</div>
+
+
+<hr style="margin:25px 0;">
+
+
+<!-- ====================================== -->
+<!-- TICKET LIST -->
+<!-- ====================================== -->
+
+<div class="ticket-list">
+
+
+{% if tickets %}
+
+
+    {% for ticket in tickets %}
+
+
+    <div class="ticket-card">
+
+
+        <!-- ====================================== -->
+        <!-- TICKET HEADER -->
+        <!-- ====================================== -->
+
+        <div class="ticket-header">
+
+
+            <div>
+
+                <div class="ticket-number">
+
+                    {{ ticket.ticket_number }}
+
+                </div>
+
+
+                <div class="ticket-line">
+
+                    {{ ticket.line }}
+
+                    &nbsp;|&nbsp;
+
+                    Shift {{ ticket.shift }}
+
+                </div>
+
+            </div>
+
+
+            <!-- STATUS -->
+
+            <div class="ticket-status">
+
+
+                {% if ticket.status == "Pending Pulling" %}
+
+                    <span class="status pending">
+
+                        🟡 Pending Pulling
+
+                    </span>
+
+
+                {% elif ticket.status == "Need Leader Confirmation" %}
+
+                    <span class="status leader">
+
+                        🔴 Need Leader
+
+                    </span>
+
+
+                {% elif ticket.status == "Approved" %}
+
+                    <span class="status approved">
+
+                        🟢 Approved
+
+                    </span>
+
+
+                {% else %}
+
+                    <span class="status pending">
+
+                        {{ ticket.status }}
+
+                    </span>
+
+                {% endif %}
+
+
+            </div>
+
+
+        </div>
+
+
+        <!-- ====================================== -->
+        <!-- NEED LEADER INFORMATION -->
+        <!-- ====================================== -->
+
+        {% if ticket.status == "Need Leader Confirmation" %}
+
+        <div
+            style="
+                margin-top:15px;
+                padding:12px;
+                border-radius:8px;
+                background:#fff7ed;
+                border-left:4px solid #e58a00;
+            "
+        >
+
+            <div
+                style="
+                    font-size:13px;
+                    font-weight:bold;
+                    color:#92400e;
+                    margin-bottom:5px;
+                "
+            >
+
+                ⚠ Menunggu Konfirmasi Leader
+
+            </div>
+
+
+            <div
+                style="
+                    font-size:14px;
+                    color:#333;
+                "
+            >
+
+                {{ ticket.need_leader_reason or "Alasan belum diisi" }}
+
+            </div>
+
+        </div>
+
+        {% endif %}
+
+
+        <!-- ====================================== -->
+        <!-- PREVIEW -->
+        <!-- ====================================== -->
+
+        <div class="preview-title">
+
+            Preview Ticket
+
+        </div>
+
+
+        <div class="preview-list">
+
+
+            {% if ticket.preview_items %}
+
+
+                {% for item in ticket.preview_items %}
+
+                <div class="preview-item">
+
+
+                    <div class="preview-number">
+
+                        {{ loop.index }}.
+
+                    </div>
+
+
+                    <div class="preview-content">
+
+
+                        <div class="preview-name">
+
+                            {{ item.part_name }}
+
+                        </div>
+
+
+                        <div class="preview-info">
+
+                            {{ item.part_number }}
+
+                            &nbsp;|&nbsp;
+
+                            Qty : {{ item.quantity }}
+
+                        </div>
+
+
+                    </div>
+
+
+                </div>
+
+                {% endfor %}
+
+
+                <!-- MORE ITEMS -->
+
+                {% if ticket.more_items and ticket.more_items > 0 %}
+
+                <div class="preview-more">
+
+                    + {{ ticket.more_items }} Part lainnya...
+
+                </div>
+
+                {% endif %}
+
+
+            {% else %}
+
+
+                <div
+                    style="
+                        padding:15px 0;
+                        text-align:center;
+                        color:#777;
+                    "
+                >
+
+                    Tidak ada detail part.
+
+                </div>
+
+
+            {% endif %}
+
+
+        </div>
+
+
+        <!-- ====================================== -->
+        <!-- TICKET INFORMATION -->
+        <!-- ====================================== -->
+
+        <div class="ticket-info-grid">
+
+
+            <div>
+
+                <small>
+                    Line
+                </small>
+
+                <b>
+                    {{ ticket.line }}
+                </b>
+
+            </div>
+
+
+            <div>
+
+                <small>
+                    Shift
+                </small>
+
+                <b>
+                    {{ ticket.shift }}
+                </b>
+
+            </div>
+
+
+            <div>
+
+                <small>
+                    Status
+                </small>
+
+                <b>
+                    {{ ticket.status }}
+                </b>
+
+            </div>
+
+
+            <div>
+
+                <small>
+                    Dibuat
+                </small>
+
+                <b>
+
+                    {% if ticket.created_at %}
+
+                        {{ ticket.created_at.strftime("%d-%m-%Y %H:%M") }}
+
+                    {% else %}
+
+                        -
+
+                    {% endif %}
+
+                </b>
+
+            </div>
+
+
+        </div>
+
+
+        <!-- ====================================== -->
+        <!-- TICKET ACTION -->
+        <!-- ====================================== -->
+
+        <div class="ticket-footer">
+
+
+            <a
+                class="open-btn"
+                href="{{ url_for(
+                    'detailticket.detail_ticket',
+                    ticket_number=ticket.ticket_number
+                ) }}"
+            >
+
+                👁 OPEN
+
+            </a>
+
+
+        </div>
+
+
+    </div>
+
+
+    {% endfor %}
+
+
+{% else %}
+
+
+    <!-- EMPTY -->
+
+    <div class="empty-box">
+
+        Tidak ada ticket.
+
+    </div>
+
+
+{% endif %}
+
+
+</div>
+
+
+</div>
+
+</div>
+
+
+
+<footer class="app-footer">
+    <strong>Crushing App by: Anjar S</strong>
+    <span>NG Material Control · © 2026</span>
+</footer>
+
+</body>
+
+</html>

@@ -1,0 +1,1169 @@
+<!DOCTYPE html>
+<html lang="id">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <title>
+        Login - Crushing App
+    </title>
+
+
+    <!-- =====================================================
+         STYLE
+    ====================================================== -->
+
+    <style>
+
+        * {
+            box-sizing: border-box;
+        }
+
+
+        html,
+        body {
+            margin: 0;
+            padding: 0;
+            width: 100%;
+            min-height: 100%;
+        }
+
+
+        body {
+
+            font-family:
+                Arial,
+                Helvetica,
+                sans-serif;
+
+            background:
+                linear-gradient(
+                    135deg,
+                    #f8fafc 0%,
+                    #eef2ff 100%
+                );
+
+            color: #111827;
+
+            min-height: 100vh;
+
+            display: flex;
+
+            flex-direction: column;
+
+            align-items: center;
+
+            justify-content: center;
+
+            padding: 20px;
+
+            /* Keep the login card centered independently
+               from the global footer. */
+            gap: 0;
+        }
+
+        /* The login wrapper is the centered main content.
+           The global footer stays underneath it. */
+        .login-wrapper {
+            width: 100%;
+            max-width: 430px;
+            flex: 0 0 auto;
+        }
+
+        /* Footer must never participate in the login card's
+           horizontal layout. */
+        body > .app-footer {
+            width: 100%;
+            max-width: 430px;
+            flex: 0 0 auto;
+            text-align: center;
+        }
+
+
+        /* =================================================
+           CONTAINER
+        ================================================= */
+
+        .login-wrapper {
+            width: 100%;
+            max-width: 430px;
+        }
+
+
+        /* =================================================
+           LOGIN CARD
+        ================================================= */
+
+        .login-card {
+
+            width: 100%;
+
+            background: #ffffff;
+
+            border-radius: 18px;
+
+            padding: 32px;
+
+            box-shadow:
+                0 15px 45px
+                rgba(15, 23, 42, 0.12);
+
+            border:
+                1px solid #e5e7eb;
+        }
+
+
+        /* =================================================
+           LOGO
+        ================================================= */
+
+        .login-logo {
+
+            width: 72px;
+
+            height: 72px;
+
+            margin:
+                0 auto 18px;
+
+            border-radius: 18px;
+
+            background:
+                linear-gradient(
+                    135deg,
+                    #2563eb,
+                    #1d4ed8
+                );
+
+            display: flex;
+
+            align-items: center;
+
+            justify-content: center;
+
+            color: white;
+
+            font-size: 34px;
+
+            box-shadow:
+                0 8px 20px
+                rgba(37, 99, 235, 0.25);
+        }
+
+
+        /* =================================================
+           HEADER
+        ================================================= */
+
+        .login-logo img { width:100%; height:100%; display:block; border-radius:18px; }
+
+        .login-header {
+
+            text-align: center;
+
+            margin-bottom: 28px;
+        }
+
+
+        .login-header .eyebrow {
+
+            margin: 0 0 7px;
+
+            font-size: 11px;
+
+            font-weight: 700;
+
+            letter-spacing: 1.5px;
+
+            color: #2563eb;
+        }
+
+
+        .login-header h1 {
+
+            margin: 0;
+
+            font-size: 27px;
+
+            line-height: 1.2;
+
+            color: #111827;
+        }
+
+
+        .login-header p {
+
+            margin:
+                9px 0 0;
+
+            font-size: 13px;
+
+            line-height: 1.5;
+
+            color: #6b7280;
+        }
+
+
+        /* =================================================
+           ALERT
+        ================================================= */
+
+        .alert {
+
+            padding: 12px 14px;
+
+            border-radius: 9px;
+
+            margin-bottom: 18px;
+
+            font-size: 13px;
+
+            line-height: 1.45;
+        }
+
+
+        .alert-error {
+
+            background: #fef2f2;
+
+            color: #991b1b;
+
+            border:
+                1px solid #fecaca;
+        }
+
+
+        .alert-success {
+
+            background: #f0fdf4;
+
+            color: #166534;
+
+            border:
+                1px solid #bbf7d0;
+        }
+
+
+        .alert-warning {
+
+            background: #fffbeb;
+
+            color: #92400e;
+
+            border:
+                1px solid #fde68a;
+        }
+
+
+        .alert-info {
+
+            background: #eff6ff;
+
+            color: #1e40af;
+
+            border:
+                1px solid #bfdbfe;
+        }
+
+
+        /* =================================================
+           FORM
+        ================================================= */
+
+        .form-group {
+
+            margin-bottom: 18px;
+        }
+
+
+        .form-label {
+
+            display: block;
+
+            margin-bottom: 7px;
+
+            font-size: 13px;
+
+            font-weight: 700;
+
+            color: #374151;
+        }
+
+
+        .input-wrapper {
+
+            position: relative;
+
+            width: 100%;
+        }
+
+
+        .form-input {
+
+            width: 100%;
+
+            height: 48px;
+
+            padding:
+                0 14px;
+
+            border:
+                1px solid #d1d5db;
+
+            border-radius: 9px;
+
+            outline: none;
+
+            background: #ffffff;
+
+            color: #111827;
+
+            font-size: 14px;
+
+            transition:
+                border-color 0.2s ease,
+                box-shadow 0.2s ease;
+        }
+
+
+        .form-input:focus {
+
+            border-color: #2563eb;
+
+            box-shadow:
+                0 0 0 3px
+                rgba(37, 99, 235, 0.12);
+        }
+
+
+        .form-input::placeholder {
+
+            color: #9ca3af;
+        }
+
+
+        /* =================================================
+           PASSWORD INPUT
+        ================================================= */
+
+        .password-input {
+
+            padding-right: 52px;
+        }
+
+
+        .password-toggle {
+
+            position: absolute;
+
+            right: 6px;
+
+            top: 50%;
+
+            transform:
+                translateY(-50%);
+
+            width: 38px;
+
+            height: 38px;
+
+            border: none;
+
+            background: transparent;
+
+            cursor: pointer;
+
+            border-radius: 7px;
+
+            color: #6b7280;
+
+            font-size: 17px;
+        }
+
+
+        .password-toggle:hover {
+
+            background: #f3f4f6;
+
+            color: #374151;
+        }
+
+
+        /* =================================================
+           REMEMBER DEVICE
+        ================================================= */
+
+        .remember-device {
+
+            display: flex;
+
+            align-items: flex-start;
+
+            gap: 10px;
+
+            margin:
+                4px 0 20px;
+        }
+
+
+        .remember-device input {
+
+            width: 17px;
+
+            height: 17px;
+
+            margin:
+                1px 0 0;
+
+            accent-color: #2563eb;
+
+            cursor: pointer;
+        }
+
+
+        .remember-device label {
+
+            cursor: pointer;
+
+            font-size: 12px;
+
+            line-height: 1.45;
+
+            color: #4b5563;
+        }
+
+
+        .remember-device strong {
+
+            display: block;
+
+            color: #374151;
+
+            margin-bottom: 2px;
+        }
+
+
+        /* =================================================
+           LOGIN BUTTON
+        ================================================= */
+
+        .login-button {
+
+            width: 100%;
+
+            height: 50px;
+
+            border: none;
+
+            border-radius: 9px;
+
+            background:
+                linear-gradient(
+                    135deg,
+                    #2563eb,
+                    #1d4ed8
+                );
+
+            color: #ffffff;
+
+            font-size: 14px;
+
+            font-weight: 700;
+
+            cursor: pointer;
+
+            box-shadow:
+                0 6px 16px
+                rgba(37, 99, 235, 0.22);
+
+            transition:
+                transform 0.15s ease,
+                box-shadow 0.15s ease,
+                opacity 0.15s ease;
+        }
+
+
+        .login-button:hover {
+
+            transform:
+                translateY(-1px);
+
+            box-shadow:
+                0 9px 20px
+                rgba(37, 99, 235, 0.28);
+        }
+
+
+        .login-button:active {
+
+            transform:
+                translateY(0);
+        }
+
+
+        .login-button:disabled {
+
+            opacity: 0.65;
+
+            cursor: not-allowed;
+
+            transform: none;
+
+            box-shadow: none;
+        }
+
+
+        /* =================================================
+           BUTTON CONTENT
+        ================================================= */
+
+        .button-content {
+
+            display: flex;
+
+            align-items: center;
+
+            justify-content: center;
+
+            gap: 9px;
+        }
+
+
+        .loading-spinner {
+
+            width: 17px;
+
+            height: 17px;
+
+            border:
+                2px solid
+                rgba(255,255,255,0.35);
+
+            border-top-color:
+                #ffffff;
+
+            border-radius: 50%;
+
+            animation:
+                spin 0.7s linear infinite;
+        }
+
+
+        @keyframes spin {
+
+            from {
+                transform: rotate(0deg);
+            }
+
+            to {
+                transform: rotate(360deg);
+            }
+
+        }
+
+
+        /* =================================================
+           SECURITY INFO
+        ================================================= */
+
+        .security-info {
+
+            display: flex;
+
+            align-items: flex-start;
+
+            gap: 9px;
+
+            margin-top: 20px;
+
+            padding: 12px;
+
+            background: #f8fafc;
+
+            border:
+                1px solid #e5e7eb;
+
+            border-radius: 9px;
+        }
+
+
+        .security-icon {
+
+            font-size: 17px;
+
+            line-height: 1;
+        }
+
+
+        .security-text {
+
+            font-size: 11px;
+
+            line-height: 1.5;
+
+            color: #6b7280;
+        }
+
+
+        .security-text strong {
+
+            color: #374151;
+        }
+
+
+        /* =================================================
+           FOOTER
+        ================================================= */
+
+        /* =================================================
+           FOOTER CREDIT - SAME AS MONITORING DASHBOARD
+        ================================================= */
+
+        .login-footer {
+            margin-top: 24px;
+            padding: 12px 16px 16px;
+            text-align: center;
+            font-size: 11px;
+            line-height: 1.5;
+            color: #64748b;
+        }
+
+        .login-footer strong {
+            display: inline;
+            margin: 0;
+            font-size: 11px;
+            font-weight: 600;
+            color: #64748b;
+        }
+
+        .login-footer span {
+            color: #64748b;
+        }
+
+
+        /* =================================================
+           MOBILE
+        ================================================= */
+
+        @media (max-width: 500px) {
+
+            body {
+                padding: 14px;
+                justify-content: center;
+                overflow-x: hidden;
+            }
+
+            body > .app-footer {
+                width: 100%;
+                max-width: 430px;
+                margin-top: 14px !important;
+                padding-left: 0 !important;
+                padding-right: 0 !important;
+            }
+
+
+            .login-card {
+
+                padding: 25px 20px;
+
+                border-radius: 15px;
+            }
+
+
+            .login-logo {
+
+                width: 64px;
+
+                height: 64px;
+
+                font-size: 29px;
+
+                border-radius: 15px;
+            }
+
+
+            .login-header h1 {
+
+                font-size: 24px;
+            }
+
+        }
+
+
+        /* =================================================
+           SMALL PHONE
+        ================================================= */
+
+        @media (max-width: 360px) {
+
+            body {
+                padding: 10px;
+                overflow-x: hidden;
+            }
+
+            body > .app-footer {
+                font-size: 10px !important;
+                line-height: 1.4 !important;
+                margin-top: 12px !important;
+            }
+
+
+            .login-card {
+
+                padding:
+                    22px 16px;
+            }
+
+
+            .login-header h1 {
+
+                font-size: 22px;
+            }
+
+
+            .form-input {
+
+                height: 46px;
+            }
+
+
+            .login-button {
+
+                height: 48px;
+            }
+
+        }
+
+    </style>
+
+</head>
+
+
+<body>
+
+
+<div class="login-wrapper">
+
+
+    <!-- =================================================
+         LOGIN CARD
+    ================================================== -->
+
+    <div class="login-card">
+
+
+        <!-- =================================================
+             LOGO
+        ================================================== -->
+
+        <div class="login-logo">
+            <img src="{{ url_for('static', filename='img/crushing-monogram.svg') }}" alt="Crushing Validation">
+        </div>
+
+
+        <!-- =================================================
+             HEADER
+        ================================================== -->
+
+        <div class="login-header">
+
+            <p class="eyebrow">
+                CRUSHING APP
+            </p>
+
+            <h1>
+                Selamat Datang
+            </h1>
+
+            <p>
+                Silakan login untuk mengakses
+                sistem Crushing App.
+            </p>
+
+        </div>
+
+
+        <!-- =================================================
+             FLASH MESSAGE
+        ================================================== -->
+
+        {% with messages = get_flashed_messages(
+            with_categories=true
+        ) %}
+
+            {% if messages %}
+
+                {% for category, message in messages %}
+
+                    <div
+                        class="
+                            alert
+                            {% if category == 'error' %}
+                                alert-error
+                            {% elif category == 'success' %}
+                                alert-success
+                            {% elif category == 'warning' %}
+                                alert-warning
+                            {% else %}
+                                alert-info
+                            {% endif %}
+                        "
+                    >
+
+                        {{ message }}
+
+                    </div>
+
+                {% endfor %}
+
+            {% endif %}
+
+        {% endwith %}
+
+
+        <!-- =================================================
+             LOGIN FORM
+        ================================================== -->
+
+        <form
+            method="POST"
+            action="{{ url_for('auth.login') }}"
+            id="loginForm"
+        >
+
+
+            <!-- =============================================
+                 USERNAME
+            ============================================== -->
+
+            <div class="form-group">
+
+                <label
+                    for="username"
+                    class="form-label"
+                >
+                    Username
+                </label>
+
+                <div class="input-wrapper">
+
+                    <input
+                        type="text"
+                        id="username"
+                        name="username"
+                        class="form-input"
+                        placeholder="Masukkan username"
+                        autocomplete="username"
+                        autocapitalize="none"
+                        spellcheck="false"
+                        required
+                        autofocus
+                    >
+
+                </div>
+
+            </div>
+
+
+            <!-- =============================================
+                 PASSWORD
+            ============================================== -->
+
+            <div class="form-group">
+
+                <label
+                    for="password"
+                    class="form-label"
+                >
+                    Password
+                </label>
+
+                <div class="input-wrapper">
+
+                    <input
+                        type="password"
+                        id="password"
+                        name="password"
+                        class="
+                            form-input
+                            password-input
+                        "
+                        placeholder="Masukkan password"
+                        autocomplete="current-password"
+                        required
+                    >
+
+
+                    <button
+                        type="button"
+                        class="password-toggle"
+                        id="togglePassword"
+                        aria-label="Tampilkan password"
+                    >
+                        👁
+                    </button>
+
+                </div>
+
+            </div>
+
+
+            <!-- =============================================
+                 REMEMBER DEVICE
+            ============================================== -->
+
+            <div class="remember-device">
+
+                <input
+                    type="checkbox"
+                    id="rememberDevice"
+                    name="remember_device"
+                    value="1"
+                    checked
+                >
+
+                <label
+                    for="rememberDevice"
+                >
+
+                    <strong>
+                        Ingat perangkat ini
+                    </strong>
+
+                    Anda tidak perlu login berulang kali
+                    pada HP/browser ini selama perangkat
+                    masih dipercaya oleh sistem.
+
+                </label>
+
+            </div>
+
+
+            <!-- =============================================
+                 LOGIN BUTTON
+            ============================================== -->
+
+            <button
+                type="submit"
+                class="login-button"
+                id="loginButton"
+            >
+
+                <span
+                    class="button-content"
+                    id="buttonContent"
+                >
+
+                    <span>
+                        Login
+                    </span>
+
+                </span>
+
+            </button>
+
+
+        </form>
+
+
+        <!-- =================================================
+             SECURITY INFORMATION
+        ================================================== -->
+
+        <div class="security-info">
+
+            <div class="security-icon">
+                🔐
+            </div>
+
+            <div class="security-text">
+
+                <strong>
+                    Perangkat terpercaya
+                </strong>
+                <br>
+
+                Setelah login pertama,
+                perangkat dapat dikenali secara otomatis
+                sehingga proses kerja lebih cepat.
+
+            </div>
+
+        </div>
+
+
+        <!-- =================================================
+             FOOTER
+        ================================================== -->
+
+        <div class="login-footer">
+            <strong>Crushing App by: Anjar S</strong>
+            <span>NG Material Control · © 2026</span>
+        </div>
+
+
+    </div>
+
+
+</div>
+
+
+<!-- =====================================================
+     JAVASCRIPT
+====================================================== -->
+
+<script>
+
+
+/* =====================================================
+   TOGGLE PASSWORD
+===================================================== */
+
+const passwordInput =
+    document.getElementById(
+        "password"
+    );
+
+const togglePassword =
+    document.getElementById(
+        "togglePassword"
+    );
+
+
+if (
+    passwordInput &&
+    togglePassword
+) {
+
+    togglePassword.addEventListener(
+        "click",
+        function() {
+
+            if (
+                passwordInput.type ===
+                "password"
+            ) {
+
+                passwordInput.type =
+                    "text";
+
+                togglePassword.textContent =
+                    "🙈";
+
+                togglePassword.setAttribute(
+                    "aria-label",
+                    "Sembunyikan password"
+                );
+
+            }
+
+            else {
+
+                passwordInput.type =
+                    "password";
+
+                togglePassword.textContent =
+                    "👁";
+
+                togglePassword.setAttribute(
+                    "aria-label",
+                    "Tampilkan password"
+                );
+
+            }
+
+        }
+    );
+
+}
+
+
+/* =====================================================
+   LOGIN LOADING
+===================================================== */
+
+const loginForm =
+    document.getElementById(
+        "loginForm"
+    );
+
+const loginButton =
+    document.getElementById(
+        "loginButton"
+    );
+
+const buttonContent =
+    document.getElementById(
+        "buttonContent"
+    );
+
+
+if (
+    loginForm &&
+    loginButton &&
+    buttonContent
+) {
+
+    loginForm.addEventListener(
+        "submit",
+        function() {
+
+            loginButton.disabled =
+                true;
+
+
+            buttonContent.innerHTML = `
+
+                <span
+                    class="loading-spinner"
+                ></span>
+
+                <span>
+                    Memproses...
+                </span>
+
+            `;
+
+        }
+    );
+
+}
+
+
+/* =====================================================
+   ENTER KEY
+===================================================== */
+
+if (username) {
+
+    username.addEventListener(
+        "keydown",
+        function(event) {
+
+            if (
+                event.key ===
+                "Enter"
+            ) {
+
+                event.preventDefault();
+
+                passwordInput.focus();
+
+            }
+
+        }
+    );
+
+}
+
+
+</script>
+</body>
+
+</html>

@@ -1,0 +1,576 @@
+<!DOCTYPE html>
+<html lang="id">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <title>Detail Ticket</title>
+
+    <link
+        rel="stylesheet"
+        href="{{ url_for(
+            'static',
+            filename='css/style.css'
+        ) }}"
+    >
+
+</head>
+
+
+<body class="page-production">
+
+{% include '_app_nav.html' %}
+
+
+
+<div class="production-shell">
+
+
+<div class="production-card">
+
+
+<!-- ========================================= -->
+<!-- HEADER -->
+<!-- ========================================= -->
+
+<div class="detail-header">
+
+    <p class="eyebrow">
+
+        Crushing Ticket
+
+    </p>
+
+
+    <h2>
+
+        {{ ticket.ticket_number }}
+
+    </h2>
+
+
+    <div class="ticket-info">
+
+
+        <div class="info-chip">
+
+            <b>Line :</b>
+
+            {{ ticket.line }}
+
+        </div>
+
+
+        <div class="info-chip">
+
+            <b>Shift :</b>
+
+            {{ ticket.shift }}
+
+        </div>
+
+
+        <div class="info-chip">
+
+            <b>Status :</b>
+
+            {{ ticket.status }}
+
+        </div>
+
+
+        <div class="info-chip">
+
+            {{ ticket.created_at.strftime("%d-%m-%Y %H:%M") }}
+
+        </div>
+
+
+    </div>
+
+</div>
+
+
+<hr>
+
+
+<!-- ========================================= -->
+<!-- LIST PART -->
+<!-- ========================================= -->
+
+{% for item in items %}
+
+
+<div class="production-card part-card">
+
+
+    <!-- ===================================== -->
+    <!-- NOMOR + NAMA PART -->
+    <!-- ===================================== -->
+
+    <div class="part-title">
+
+
+        <div class="part-index">
+
+            {{ loop.index }}
+
+        </div>
+
+
+        <div class="part-name">
+
+            {{ item.part_name }}
+
+        </div>
+
+
+    </div>
+
+
+    <!-- ===================================== -->
+    <!-- FOTO PART -->
+    <!-- ===================================== -->
+
+    <div
+        style="
+            width:100%;
+            margin:20px 0;
+        "
+    >
+
+
+        {% if item.photo %}
+
+
+        <div
+            style="
+                width:100%;
+            "
+        >
+
+            <img
+
+                src="{{ url_for(
+                    'static',
+                    filename='part/' + item.photo
+                ) }}"
+
+                alt="{{ item.part_name }}"
+
+                style="
+                    width:100%;
+                    max-width:100%;
+                    height:auto;
+                    max-height:500px;
+                    object-fit:contain;
+                    display:block;
+                    margin:0 auto;
+                    border-radius:12px;
+                    border:1px solid #ddd;
+                    box-sizing:border-box;
+                "
+
+            >
+
+        </div>
+
+
+        {% else %}
+
+
+        <div
+            class="photo-placeholder"
+            style="
+                width:100%;
+                box-sizing:border-box;
+            "
+        >
+
+
+            <div class="icon">
+
+                📦
+
+            </div>
+
+
+            <div class="text">
+
+                FOTO BELUM TERSEDIA
+
+            </div>
+
+
+        </div>
+
+
+        {% endif %}
+
+
+    </div>
+
+
+    <!-- ===================================== -->
+    <!-- PART NUMBER + QTY -->
+    <!-- ===================================== -->
+
+    <div class="part-footer">
+
+
+        <div class="part-number">
+
+            {{ item.part_number }}
+
+        </div>
+
+
+        <div class="qty-box">
+
+            {{ item.quantity }} PCS
+
+        </div>
+
+
+    </div>
+
+
+</div>
+
+
+{% endfor %}
+
+
+<!-- ========================================= -->
+<!-- ACTION NEED LEADER -->
+<!-- ========================================= -->
+
+{% if need_leader_mode %}
+
+
+<div
+    style="
+        margin-top:30px;
+        padding:20px;
+        background:#fff7ed;
+        border:2px solid #f59e0b;
+        border-radius:16px;
+    "
+>
+
+
+    <h3
+        style="
+            margin-top:0;
+            color:#b45309;
+        "
+    >
+
+        ⚠ NEED LEADER
+
+    </h3>
+
+
+    <p
+        style="
+            color:#555;
+            margin-bottom:20px;
+        "
+    >
+
+        Pilih alasan mengapa ticket membutuhkan
+        konfirmasi Leader.
+
+    </p>
+
+
+    {% if error_message %}
+
+
+    <div
+        style="
+            background:#fee2e2;
+            color:#b91c1c;
+            padding:12px;
+            border-radius:8px;
+            margin-bottom:15px;
+            font-weight:bold;
+        "
+    >
+
+        {{ error_message }}
+
+    </div>
+
+
+    {% endif %}
+
+
+    <form
+        method="POST"
+        action="{{ url_for(
+            'detailticket.need_leader',
+            ticket_number=ticket.ticket_number
+        ) }}"
+    >
+
+
+        <div class="field">
+
+
+            <label
+                style="
+                    display:block;
+                    font-weight:bold;
+                    margin-bottom:8px;
+                "
+            >
+
+                Alasan Problem
+
+            </label>
+
+
+            <select
+                name="reason"
+                required
+                style="
+                    width:100%;
+                    padding:14px;
+                    border:1px solid #ccc;
+                    border-radius:10px;
+                    font-size:16px;
+                    background:white;
+                    box-sizing:border-box;
+                "
+            >
+
+
+                <option value="">
+
+                    -- Pilih Alasan --
+
+                </option>
+
+
+                <option value="Part Number Tidak Sesuai">
+
+                    Part Number Tidak Sesuai
+
+                </option>
+
+
+                <option value="Quantity Tidak Sesuai">
+
+                    Quantity Tidak Sesuai
+
+                </option>
+
+
+                <option value="Part Fisik Bermasalah">
+
+                    Part Fisik Bermasalah
+
+                </option>
+
+
+                <option value="Part Tidak Ditemukan">
+
+                    Part Tidak Ditemukan
+
+                </option>
+
+
+                <option value="Data Sistem Tidak Sesuai">
+
+                    Data Sistem Tidak Sesuai
+
+                </option>
+
+
+                <option value="Salah Transaksi">
+
+                    Salah Transaksi
+
+                </option>
+
+
+                <option value="Lainnya">
+
+                    Lainnya
+
+                </option>
+
+
+            </select>
+
+
+        </div>
+
+
+        <div
+            style="
+                display:flex;
+                gap:12px;
+                margin-top:20px;
+                flex-wrap:wrap;
+            "
+        >
+
+
+            <button
+                type="submit"
+                style="
+                    flex:1;
+                    min-width:150px;
+                    background:#f59e0b;
+                    color:white;
+                    border:none;
+                    border-radius:10px;
+                    padding:15px;
+                    font-size:16px;
+                    font-weight:bold;
+                    cursor:pointer;
+                "
+            >
+
+                ⚠ KIRIM KE LEADER
+
+            </button>
+
+
+            <a
+                href="{{ url_for(
+                    'detailticket.detail_ticket',
+                    ticket_number=ticket.ticket_number
+                ) }}"
+                style="
+                    flex:1;
+                    min-width:150px;
+                    background:#e5e7eb;
+                    color:#333;
+                    text-decoration:none;
+                    border-radius:10px;
+                    padding:15px;
+                    text-align:center;
+                    font-weight:bold;
+                    box-sizing:border-box;
+                "
+            >
+
+                ← BATAL
+
+            </a>
+
+
+        </div>
+
+
+    </form>
+
+
+</div>
+
+
+{% else %}
+
+
+<!-- ========================================= -->
+<!-- ACTION BUTTON -->
+<!-- ========================================= -->
+
+<div class="action-group">
+
+
+    <!-- APPROVE -->
+
+    <a
+        href="{{ url_for(
+            'detailticket.approve_ticket',
+            ticket_number=ticket.ticket_number
+        ) }}"
+        class="approve-btn"
+        onclick="
+            return confirm(
+                'Yakin ticket ini sudah selesai dan ingin di-APPROVE?'
+            );
+        "
+    >
+
+        ✓ APPROVE
+
+    </a>
+
+
+    <!-- NEED LEADER -->
+
+    <a
+        href="{{ url_for(
+            'detailticket.need_leader',
+            ticket_number=ticket.ticket_number
+        ) }}"
+        class="leader-btn"
+    >
+
+        ⚠ NEED LEADER
+
+    </a>
+
+
+</div>
+
+
+{% endif %}
+
+
+<!-- ========================================= -->
+<!-- BACK BUTTON -->
+<!-- ========================================= -->
+
+<a
+    href="{{ url_for('pulling.pulling') }}"
+    style="
+        display:block;
+        margin-top:20px;
+        background:#2563eb;
+        color:white;
+        text-decoration:none;
+        padding:15px;
+        text-align:center;
+        border-radius:10px;
+        font-weight:bold;
+        box-sizing:border-box;
+    "
+>
+
+    ← Kembali ke Pulling
+
+</a>
+
+
+</div>
+
+
+</div>
+
+
+</div>
+
+
+
+<footer class="app-footer">
+    <strong>Crushing App by: Anjar S</strong>
+    <span>NG Material Control · © 2026</span>
+</footer>
+
+</body>
+
+
+</html>
+```

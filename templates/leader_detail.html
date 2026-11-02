@@ -1,0 +1,1448 @@
+```html
+<!DOCTYPE html>
+<html lang="id">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <title>
+        Leader Detail Ticket
+    </title>
+
+    <link
+        rel="stylesheet"
+        href="{{ url_for(
+            'static',
+            filename='css/style.css'
+        ) }}"
+    >
+    <style>
+
+/* =====================================================
+   LEADER DETAIL — DARK MODE OVERRIDE
+   Tidak mengubah fungsi / JavaScript
+===================================================== */
+
+html[data-theme="dark"] body {
+    background: #08111f !important;
+    color: #f1f5f9 !important;
+}
+
+
+/* =====================================================
+   MAIN CARD
+===================================================== */
+
+html[data-theme="dark"] .production-card {
+    background: #0f172a !important;
+    color: #f1f5f9 !important;
+    border-color: #334155 !important;
+}
+
+
+/* =====================================================
+   TICKET INFORMATION
+===================================================== */
+
+html[data-theme="dark"] .production-card > div[style*="background:#f3f6fa"] {
+    background: #111827 !important;
+    border: 1px solid #334155 !important;
+    color: #f1f5f9 !important;
+}
+
+
+/* Ticket Number */
+
+html[data-theme="dark"] .production-card > div[style*="background:#f3f6fa"] h2 {
+    color: #f8fafc !important;
+}
+
+
+/* Label */
+
+html[data-theme="dark"] .production-card small {
+    color: #94a3b8 !important;
+}
+
+
+/* Line / Shift / Status */
+
+html[data-theme="dark"] .production-card h3 {
+    color: #f1f5f9 !important;
+}
+
+
+/* Status tetap orange */
+
+html[data-theme="dark"]
+.production-card div[style*="color:#e58a00"] h3,
+html[data-theme="dark"]
+h3[style*="color:#e58a00"] {
+    color: #f59e0b !important;
+}
+
+
+/* =====================================================
+   NEED LEADER REASON
+===================================================== */
+
+html[data-theme="dark"] div[style*="background:#fff7ed"] {
+    background: #302414 !important;
+    border-left-color: #f59e0b !important;
+    color: #f8fafc !important;
+}
+
+
+html[data-theme="dark"] div[style*="background:#fff7ed"] h3 {
+    color: #f8fafc !important;
+}
+
+
+html[data-theme="dark"] div[style*="background:#fff7ed"] div {
+    color: #e2e8f0 !important;
+}
+
+
+/* =====================================================
+   PART CARD
+===================================================== */
+
+html[data-theme="dark"]
+div[style*="background:white"] {
+    background: #111827 !important;
+    border-color: #334155 !important;
+    color: #f1f5f9 !important;
+}
+
+
+/* Part Number / Quantity / Part Name */
+
+html[data-theme="dark"]
+div[style*="background:white"] h3 {
+    color: #f8fafc !important;
+}
+
+
+/* =====================================================
+   HR
+===================================================== */
+
+html[data-theme="dark"] hr {
+    border-color: #334155 !important;
+}
+
+
+/* =====================================================
+   INPUT EDIT MODE
+===================================================== */
+
+html[data-theme="dark"]
+input.edit-mode {
+    background: #0b1220 !important;
+    color: #f8fafc !important;
+    border-color: #475569 !important;
+}
+
+
+html[data-theme="dark"]
+input.edit-mode:focus {
+    border-color: #3b82f6 !important;
+    outline: none !important;
+    box-shadow: 0 0 0 3px rgba(59,130,246,.15) !important;
+}
+
+
+/* Part Name readonly */
+
+html[data-theme="dark"]
+input.part-name-input {
+    background: #1e293b !important;
+    color: #94a3b8 !important;
+    border-color: #475569 !important;
+}
+
+
+/* =====================================================
+   FOTO PART
+===================================================== */
+
+html[data-theme="dark"]
+img[id^="photo_"] {
+    border-color: #475569 !important;
+    background: #0b1220 !important;
+}
+
+
+/* =====================================================
+   FOTO BELUM TERSEDIA
+===================================================== */
+
+html[data-theme="dark"]
+div[id^="no_photo_"] {
+    background: #1e293b !important;
+    color: #94a3b8 !important;
+    border: 1px solid #334155 !important;
+}
+
+/* Placeholder foto berbentuk kotak dengan ikon kamera untuk demo */
+.leader-photo-placeholder {
+    width: 100%;
+    max-width: 350px;
+    aspect-ratio: 1 / 1;
+    box-sizing: border-box;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+    margin: 0 auto;
+    padding: 20px;
+    border: 1px dashed #b8c3d1;
+    border-radius: 12px;
+    background: #f7f9fc;
+    color: #64748b;
+    text-align: center;
+    font-size: 14px;
+}
+.leader-photo-icon {
+    width: 76px;
+    height: 76px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 16px;
+    background: #e7eef8;
+    font-size: 42px;
+    line-height: 1;
+}
+html[data-theme="dark"] .leader-photo-placeholder {
+    background: #111827;
+    border-color: #475569;
+    color: #cbd5e1;
+}
+html[data-theme="dark"] .leader-photo-icon {
+    background: #1e293b;
+}
+
+
+/* =====================================================
+   TIDAK ADA DATA PART
+===================================================== */
+
+html[data-theme="dark"]
+div[style*="background:#ffebee"] {
+    background: #351820 !important;
+    color: #fecdd3 !important;
+    border: 1px solid #7f3040 !important;
+}
+
+
+/* =====================================================
+   EYEBROW
+===================================================== */
+
+html[data-theme="dark"] .eyebrow {
+    color: #93c5fd !important;
+}
+
+
+/* =====================================================
+   GENERAL TEXT
+===================================================== */
+
+html[data-theme="dark"] .production-card {
+    color: #e2e8f0 !important;
+}
+
+
+/* =====================================================
+   MASTER PART HIDDEN DATA
+===================================================== */
+
+html[data-theme="dark"] .master-part {
+    color: inherit;
+}
+
+
+/* =====================================================
+   BUTTON EDIT
+===================================================== */
+
+html[data-theme="dark"] #editButton {
+    background: #d97706 !important;
+}
+
+
+/* =====================================================
+   BUTTON SAVE
+===================================================== */
+
+html[data-theme="dark"] #saveButton {
+    background: #16a34a !important;
+}
+
+
+/* =====================================================
+   BUTTON BACK
+===================================================== */
+
+html[data-theme="dark"]
+a[href*="monitoring.monitoring"] {
+    background: #2563eb !important;
+}
+
+
+/* =====================================================
+   DELETE BUTTON
+===================================================== */
+
+html[data-theme="dark"]
+button[style*="background:#dc2626"] {
+    background: #dc2626 !important;
+}
+
+
+/* =====================================================
+   RESPONSIVE MOBILE
+===================================================== */
+
+@media (max-width: 600px) {
+
+    html[data-theme="dark"] .production-card {
+        margin: 15px auto !important;
+        padding: 15px !important;
+    }
+
+    html[data-theme="dark"]
+    .production-header {
+        gap: 15px;
+    }
+
+    html[data-theme="dark"]
+    .production-header h1 {
+        font-size: 28px;
+    }
+
+}
+
+</style>
+
+</head>
+
+
+<body>
+
+{% include '_app_nav.html' %}
+
+
+
+<div
+    class="production-card"
+    style="
+        max-width:900px;
+        margin:30px auto;
+    "
+>
+
+
+    <!-- ===================================== -->
+    <!-- HEADER -->
+    <!-- ===================================== -->
+
+    <div class="production-header">
+
+        <div>
+
+            <p class="eyebrow">
+                Crushing Ticket
+            </p>
+
+            <h1>
+                Need Leader Confirmation
+            </h1>
+
+        </div>
+
+
+        <div class="badge">
+            Leader
+        </div>
+
+    </div>
+
+
+    <hr>
+
+
+    <!-- ===================================== -->
+    <!-- TICKET INFORMATION -->
+    <!-- ===================================== -->
+
+    <div
+        style="
+            background:#f3f6fa;
+            padding:20px;
+            border-radius:12px;
+            margin-bottom:20px;
+        "
+    >
+
+        <h2
+            style="
+                margin-top:0;
+                margin-bottom:15px;
+            "
+        >
+            {{ ticket.ticket_number }}
+        </h2>
+
+
+        <div
+            style="
+                display:flex;
+                flex-wrap:wrap;
+                gap:25px;
+            "
+        >
+
+
+            <!-- LINE -->
+
+            <div>
+
+                <small>
+                    Line
+                </small>
+
+                <h3>
+                    {{ ticket.line }}
+                </h3>
+
+            </div>
+
+
+            <!-- SHIFT -->
+
+            <div>
+
+                <small>
+                    Shift
+                </small>
+
+                <h3>
+                    {{ ticket.shift }}
+                </h3>
+
+            </div>
+
+
+            <!-- STATUS -->
+
+            <div>
+
+                <small>
+                    Status
+                </small>
+
+                <h3
+                    style="
+                        color:#e58a00;
+                    "
+                >
+                    {{ ticket.status }}
+                </h3>
+
+            </div>
+
+
+        </div>
+
+    </div>
+
+
+    <!-- ===================================== -->
+    <!-- NEED LEADER REASON -->
+    <!-- ===================================== -->
+
+    <div
+        style="
+            background:#fff7ed;
+            border-left:5px solid #e58a00;
+            padding:18px;
+            border-radius:10px;
+            margin-bottom:25px;
+        "
+    >
+
+        <h3
+            style="
+                margin-top:0;
+            "
+        >
+            ⚠ Alasan Need Leader
+        </h3>
+
+
+        <div
+            style="
+                font-size:18px;
+            "
+        >
+            {{ ticket.need_leader_reason }}
+        </div>
+
+    </div>
+
+
+    <!-- ===================================== -->
+    <!-- MASTER PART DATA -->
+    <!-- ===================================== -->
+
+    <div
+        id="masterPartsData"
+        style="display:none;"
+    >
+
+        {% for part in parts %}
+
+        <div
+            class="master-part"
+            data-part-id="{{ part.id }}"
+            data-part-number="{{ part.part_number }}"
+            data-part-name="{{ part.part_name }}"
+            data-photo="{{ part.photo or '' }}"
+        ></div>
+
+        {% endfor %}
+
+    </div>
+
+
+    <!-- ===================================== -->
+    <!-- PART LIST -->
+    <!-- ===================================== -->
+
+    <h2>
+        Daftar Part
+    </h2>
+
+
+    <!-- ===================================== -->
+    <!-- FORM EDIT -->
+    <!-- ===================================== -->
+
+    <form
+        method="POST"
+        action="{{ url_for(
+            'detailticket.leader_edit_ticket',
+            ticket_number=ticket.ticket_number
+        ) }}"
+        id="leaderEditForm"
+    >
+        <input type="hidden" name="deleted_item_ids" id="deletedItemIds" value="">
+        <div class="leader-manual-add" style="display:none;margin:0 0 20px;padding:16px;border:1px dashed #94a3b8;border-radius:12px;">
+            <strong>Tambah Part Manual</strong>
+            <p style="margin:6px 0 12px;color:#64748b;font-size:13px;">Pilih part dari Master Part dan masukkan qty aktual. Qty manual tidak dikalikan BOM.</p>
+            <div style="display:flex;gap:10px;flex-wrap:wrap;align-items:center;">
+                <select id="leaderNewPartSelect" style="flex:1;min-width:220px;padding:10px;border:1px solid #cbd5e1;border-radius:8px;">
+                    <option value="">Pilih Part</option>
+                    {% for part in parts %}<option value="{{ part.id }}">{{ part.part_number }} — {{ part.part_name }} ({{ part.line }}/{{ part.model }})</option>{% endfor %}
+                </select>
+                <input type="number" id="leaderNewPartQty" min="1" value="1" style="width:90px;padding:10px;border:1px solid #cbd5e1;border-radius:8px;" aria-label="Quantity part manual">
+                <button type="button" id="leaderAddPartButton" style="padding:10px 14px;border:0;border-radius:8px;background:#2563eb;color:#fff;font-weight:700;">+ Tambah</button>
+            </div>
+            <div id="leaderNewPartsList" style="margin-top:12px;display:grid;gap:8px;"></div>
+        </div>
+
+
+        {% if items %}
+
+
+            {% for item in items %}
+
+
+            <!-- ================================= -->
+            <!-- PART CARD -->
+            <!-- ================================= -->
+
+            <div
+                class="leader-part-card"
+                data-item-id="{{ item.id }}"
+                style="
+                    border:1px solid #e5e7eb;
+                    border-radius:12px;
+                    padding:20px;
+                    margin-bottom:20px;
+                    background:white;
+                "
+            >
+
+
+                <!-- ================================= -->
+                <!-- PART NUMBER + QUANTITY -->
+                <!-- ================================= -->
+
+                <div
+                    style="
+                        display:flex;
+                        justify-content:space-between;
+                        align-items:flex-start;
+                        gap:20px;
+                        flex-wrap:wrap;
+                    "
+                >
+
+
+                    <!-- PART NUMBER -->
+
+                    <div
+                        style="
+                            flex:1;
+                            min-width:220px;
+                        "
+                    >
+
+                        <small>
+                            Part Number
+                        </small>
+
+
+                        <!-- VIEW MODE -->
+
+                        <div class="view-mode">
+
+                            <h3
+                                style="
+                                    margin:5px 0;
+                                "
+                            >
+                                {{ item.part_number }}
+                            </h3>
+
+                        </div>
+
+
+                        <!-- EDIT MODE -->
+
+                        <input
+                            type="text"
+                            name="part_number_{{ item.id }}"
+                            value="{{ item.part_number }}"
+                            class="edit-mode part-number-input"
+                            data-item-id="{{ item.id }}"
+                            style="
+                                display:none;
+                                width:100%;
+                                padding:10px;
+                                border:1px solid #ccc;
+                                border-radius:8px;
+                                box-sizing:border-box;
+                                text-transform:uppercase;
+                            "
+                        >
+
+                    </div>
+
+
+                    <!-- QUANTITY -->
+
+                    <div
+                        style="
+                            flex:1;
+                            min-width:180px;
+                        "
+                    >
+
+                        <small>
+                            Quantity
+                        </small>
+
+
+                        <!-- VIEW MODE -->
+
+                        <div class="view-mode">
+
+                            <h3
+                                style="
+                                    margin:5px 0;
+                                "
+                            >
+                                {{ item.quantity }}
+                            </h3>
+
+                        </div>
+
+
+                        <!-- EDIT MODE -->
+
+                        <input
+                            type="number"
+                            name="quantity_{{ item.id }}"
+                            value="{{ item.quantity }}"
+                            min="1"
+                            class="edit-mode"
+                            style="
+                                display:none;
+                                width:100%;
+                                padding:10px;
+                                border:1px solid #ccc;
+                                border-radius:8px;
+                                box-sizing:border-box;
+                            "
+                        >
+
+                    </div>
+
+
+                </div>
+
+
+                <hr
+                    style="
+                        margin:20px 0;
+                    "
+                >
+
+
+                <!-- ================================= -->
+                <!-- PART NAME -->
+                <!-- ================================= -->
+
+                <div>
+
+                    <small>
+                        Part Name
+                    </small>
+
+
+                    <!-- VIEW MODE -->
+
+                    <div class="view-mode">
+
+                        <h3
+                            style="
+                                margin:5px 0;
+                            "
+                        >
+                            {{ item.part_name }}
+                        </h3>
+
+                    </div>
+
+
+                    <!-- EDIT MODE -->
+
+                    <input
+                        type="text"
+                        value="{{ item.part_name }}"
+                        class="edit-mode part-name-input"
+                        data-item-id="{{ item.id }}"
+                        readonly
+                        style="
+                            display:none;
+                            width:100%;
+                            padding:10px;
+                            border:1px solid #ccc;
+                            border-radius:8px;
+                            box-sizing:border-box;
+                            background:#f3f4f6;
+                            cursor:not-allowed;
+                        "
+                    >
+
+                </div>
+
+
+                <!-- ================================= -->
+                <!-- PHOTO PART -->
+                <!-- ================================= -->
+
+                <div
+                    style="
+                        margin-top:20px;
+                    "
+                >
+
+                    <small>
+                        Foto Part Referensi
+                    </small>
+
+
+                    <!-- FOTO -->
+
+                    <img
+                        id="photo_{{ item.id }}"
+
+                        src="{% if item.photo %}{{ url_for(
+                            'static',
+                            filename='part/' + item.photo
+                        ) }}{% endif %}"
+
+                        alt="{{ item.part_name }}"
+                        onerror="this.hidden=true; var fallback=document.getElementById('no_photo_{{ item.id }}'); if(fallback){fallback.style.display='block';}"
+
+                        {% if not item.photo %}
+                        hidden
+                        {% endif %}
+
+                        style="
+                            width:100%;
+                            max-width:350px;
+                            height:auto;
+                            display:block;
+                            margin-top:10px;
+                            border-radius:10px;
+                            border:1px solid #ddd;
+                        "
+                    >
+
+
+                    <!-- FOTO TIDAK TERSEDIA -->
+
+                    <div
+                        id="no_photo_{{ item.id }}"
+
+                        {% if item.photo %}
+
+                        style="
+                            display:none;
+                        "
+
+                        {% else %}
+
+                        style="
+                            margin-top:10px;
+                            padding:15px;
+                            background:#f3f4f6;
+                            border-radius:8px;
+                            color:#666;
+                            font-size:14px;
+                            text-align:center;
+                        "
+
+                        {% endif %}
+                    >
+
+                        <div class="leader-photo-placeholder" role="img" aria-label="Foto part belum tersedia">
+                            <svg class="leader-photo-icon" viewBox="0 0 64 64" aria-hidden="true" focusable="false">
+                                <path d="M22 12h20l5 8h7a5 5 0 0 1 5 5v25a5 5 0 0 1-5 5H10a5 5 0 0 1-5-5V25a5 5 0 0 1 5-5h7z" fill="none" stroke="currentColor" stroke-width="3.5" stroke-linejoin="round"/>
+                                <circle cx="32" cy="37" r="11" fill="none" stroke="currentColor" stroke-width="3.5"/>
+                                <circle cx="49" cy="26" r="2.5" fill="currentColor"/>
+                            </svg>
+                            <span>Foto part belum tersedia</span>
+                        </div>
+
+                    </div>
+
+
+                </div>
+
+
+                <!-- ================================= -->
+                <!-- DELETE -->
+                <!-- ================================= -->
+
+                <div
+                    class="edit-mode"
+                    style="
+                        display:none;
+                        margin-top:20px;
+                    "
+                >
+
+                    <button
+                        type="button"
+                        class="stage-delete-part"
+                        data-item-id="{{ item.id }}"
+
+                        style="
+                            width:100%;
+                            background:#dc2626;
+                            color:white;
+                            padding:12px;
+                            border:none;
+                            border-radius:8px;
+                            font-size:15px;
+                            font-weight:bold;
+                            cursor:pointer;
+                        "
+                    >
+
+                        🗑 Hapus Part dari Ticket
+
+                    </button>
+
+                </div>
+
+
+            </div>
+
+
+            {% endfor %}
+
+
+        {% else %}
+
+
+            <!-- TIDAK ADA PART -->
+
+            <div
+                style="
+                    background:#ffebee;
+                    padding:15px;
+                    border-radius:10px;
+                "
+            >
+
+                Tidak ada data part pada ticket ini.
+
+            </div>
+
+
+        {% endif %}
+
+
+    </form>
+
+
+    <!-- ===================================== -->
+    <!-- DELETE FORM -->
+    <!-- ===================================== -->
+
+    {% for item in items %}
+
+    <form
+        id="deleteForm{{ item.id }}"
+        method="POST"
+
+        action="{{ url_for(
+            'detailticket.leader_delete_item',
+            item_id=item.id
+        ) }}"
+    ></form>
+
+    {% endfor %}
+
+
+    <!-- ===================================== -->
+    <!-- ACTION BUTTON -->
+    <!-- ===================================== -->
+
+    <div
+        style="
+            margin-top:30px;
+            display:flex;
+            gap:15px;
+            flex-wrap:wrap;
+        "
+    >
+
+
+        <!-- EDIT -->
+
+        <button
+            type="button"
+            id="editButton"
+
+            style="
+                flex:1;
+                min-width:180px;
+                background:#e58a00;
+                color:white;
+                padding:14px;
+                border:none;
+                border-radius:10px;
+                font-size:16px;
+                font-weight:bold;
+                cursor:pointer;
+            "
+        >
+
+            ✏ Edit Ticket
+
+        </button>
+
+
+        <!-- ADD PART -->
+        
+
+        <!-- SAVE -->
+
+        <button
+            type="submit"
+            form="leaderEditForm"
+            id="saveButton"
+
+            style="
+                display:none;
+                flex:1;
+                min-width:180px;
+                background:#16a34a;
+                color:white;
+                padding:14px;
+                border:none;
+                border-radius:10px;
+                font-size:16px;
+                font-weight:bold;
+                cursor:pointer;
+            "
+        >
+
+            💾 Simpan & Selesai
+
+        </button>
+
+
+        <!-- BACK -->
+
+        <a
+            href="{{ url_for(
+                'monitoring.monitoring'
+            ) }}"
+
+            style="
+                flex:1;
+                min-width:180px;
+                text-align:center;
+                background:#2563eb;
+                color:white;
+                padding:14px;
+                border-radius:10px;
+                text-decoration:none;
+                font-size:16px;
+                font-weight:bold;
+                box-sizing:border-box;
+            "
+        >
+
+            ← Kembali
+
+        </a>
+
+
+    </div>
+
+
+</div>
+
+
+<!-- ===================================== -->
+<!-- JAVASCRIPT -->
+<!-- ===================================== -->
+
+<script>
+
+
+/* =========================================
+   EDIT MODE
+========================================= */
+
+const editButton =
+    document.getElementById(
+        "editButton"
+    );
+
+
+const saveButton =
+    document.getElementById(
+        "saveButton"
+    );
+
+
+if (editButton) {
+
+
+    editButton.addEventListener(
+        "click",
+        function() {
+
+
+            /* SEMBUNYIKAN VIEW MODE */
+
+            document
+                .querySelectorAll(
+                    ".view-mode"
+                )
+                .forEach(
+                    function(element) {
+
+                        element.style.display =
+                            "none";
+
+                    }
+                );
+
+
+            /* TAMPILKAN EDIT MODE */
+
+            document
+                .querySelectorAll(
+                    ".edit-mode"
+                )
+                .forEach(
+                    function(element) {
+
+                        element.style.display =
+                            "block";
+
+                    }
+                );
+
+
+            /* SEMBUNYIKAN BUTTON EDIT */
+
+            editButton.style.display =
+                "none";
+
+
+            /* TAMPILKAN BUTTON SAVE */
+
+            saveButton.style.display =
+                "block";
+
+
+        }
+    );
+
+
+}
+
+
+/* =========================================
+   AMBIL DATA MASTER PART
+========================================= */
+
+const masterParts = [];
+
+
+document
+    .querySelectorAll(
+        ".master-part"
+    )
+    .forEach(
+        function(element) {
+
+
+            masterParts.push(
+                {
+
+                    id: element.dataset.partId,
+
+                    part_number:
+                        element.dataset.partNumber,
+
+                    line: element.dataset.line || '',
+                    model: element.dataset.model || '',
+
+                    part_name:
+                        element.dataset.partName,
+
+                    photo:
+                        element.dataset.photo
+
+                }
+            );
+
+
+        }
+    );
+
+
+/* =========================================
+   STAGED DELETE + ADD MANUAL PART
+========================================= */
+(function () {
+    const form = document.getElementById('leaderEditForm');
+    const editButton = document.getElementById('editButton');
+    const addButton = document.getElementById('showAddPartButton');
+    const addPanel = document.querySelector('.leader-manual-add');
+    const deletedInput = document.getElementById('deletedItemIds');
+    const deletedIds = new Set();
+    const manualRows = document.getElementById('leaderNewPartsList');
+    const partSelect = document.getElementById('leaderNewPartSelect');
+    const qtyInput = document.getElementById('leaderNewPartQty');
+    const addOne = document.getElementById('leaderAddPartButton');
+    if (!form) return;
+
+    document.querySelectorAll('.stage-delete-part').forEach(btn => {
+        btn.addEventListener('click', () => {
+            if (!confirm('Hapus part ini saat perubahan disimpan?')) return;
+            const id = String(btn.dataset.itemId);
+            deletedIds.add(id);
+            deletedInput.value = [...deletedIds].join(',');
+            const card = document.querySelector('.leader-part-card[data-item-id="' + id + '"]');
+            if (card) { card.style.display = 'none'; card.dataset.stagedDeleted = 'true'; }
+            form.dataset.dirty = 'true';
+        });
+    });
+
+    if (addButton) addButton.addEventListener('click', () => { if (addPanel) addPanel.style.display = addPanel.style.display === 'block' ? 'none' : 'block'; });
+    if (addOne) addOne.addEventListener('click', () => {
+        const partId = partSelect.value;
+        const qty = parseInt(qtyInput.value, 10);
+        if (!partId) { alert('Pilih part terlebih dahulu.'); return; }
+        if (!Number.isInteger(qty) || qty < 1) { alert('Qty harus minimal 1.'); return; }
+        const part = masterParts.find(p => String(p.id) === String(partId));
+        if (!part) { alert('Data part tidak ditemukan.'); return; }
+        const row = document.createElement('div');
+        row.style.cssText = 'display:flex;gap:10px;align-items:center;justify-content:space-between;padding:10px;background:#f8fafc;border-radius:8px;';
+        const label = document.createElement('span');
+        label.textContent = `${part.part_number} — ${part.part_name} | Qty ${qty}`;
+        const cancel = document.createElement('button');
+        cancel.type = 'button'; cancel.textContent = 'Batal';
+        cancel.style.cssText = 'border:0;background:#fee2e2;color:#991b1b;border-radius:6px;padding:6px 10px;';
+        const idField = document.createElement('input'); idField.type='hidden'; idField.name='new_part_id'; idField.value=partId;
+        const qtyField = document.createElement('input'); qtyField.type='hidden'; qtyField.name='new_quantity'; qtyField.value=String(qty);
+        row.append(label, cancel, idField, qtyField);
+        cancel.addEventListener('click', () => row.remove());
+        manualRows.appendChild(row);
+        partSelect.value = ''; qtyInput.value = '1'; form.dataset.dirty = 'true';
+    });
+
+    const originalEditClick = editButton?.onclick;
+    if (editButton) editButton.addEventListener('click', () => {
+        if (addButton) addButton.style.display = 'block';
+        document.querySelectorAll('.stage-delete-part').forEach(btn => btn.style.display = 'block');
+    });
+
+    form.querySelectorAll('input').forEach(input => {
+        input.addEventListener('input', () => { form.dataset.dirty = 'true'; });
+    });
+    form.addEventListener('submit', () => {
+        const save = document.getElementById('saveButton');
+        if (save) { save.disabled = true; save.textContent = 'Menyimpan…'; }
+    });
+    window.addEventListener('beforeunload', event => {
+        if (form.dataset.dirty === 'true') { event.preventDefault(); event.returnValue = ''; }
+    });
+})();
+
+/* =========================================
+   UPDATE PART NAME DAN FOTO OTOMATIS
+========================================= */
+
+document
+    .querySelectorAll(
+        ".part-number-input"
+    )
+    .forEach(
+        function(input) {
+
+
+            input.addEventListener(
+                "input",
+                function() {
+
+
+                    /* =========================
+                       AMBIL ITEM ID
+                    ========================= */
+
+                    const itemId =
+                        input.dataset.itemId;
+
+
+                    /* =========================
+                       PART NUMBER
+                    ========================= */
+
+                    const partNumber =
+                        input.value
+                            .trim()
+                            .toUpperCase();
+
+
+                    /* =========================
+                       PART NAME INPUT
+                    ========================= */
+
+                    const partNameInput =
+                        document.querySelector(
+                            '.part-name-input[data-item-id="' +
+                            itemId +
+                            '"]'
+                        );
+
+
+                    /* =========================
+                       FOTO
+                    ========================= */
+
+                    const photo =
+                        document.getElementById(
+                            "photo_" +
+                            itemId
+                        );
+
+
+                    /* =========================
+                       KETERANGAN FOTO
+                    ========================= */
+
+                    const noPhoto =
+                        document.getElementById(
+                            "no_photo_" +
+                            itemId
+                        );
+
+
+                    /* =========================
+                       CARI PART
+                    ========================= */
+
+                    const selectedPart =
+                        masterParts.find(
+                            function(part) {
+
+                                return (
+
+                                    String(
+                                        part.part_number
+                                    )
+                                    .trim()
+                                    .toUpperCase()
+
+                                    ===
+
+                                    partNumber
+
+                                );
+
+                            }
+                        );
+
+
+                    /* =========================
+                       PART DITEMUKAN
+                    ========================= */
+
+                    if (selectedPart) {
+
+
+                        /* UPDATE PART NAME */
+
+                        if (partNameInput) {
+
+                            partNameInput.value =
+                                selectedPart.part_name;
+
+                        }
+
+
+                        /* ADA FOTO */
+
+                        if (
+                            selectedPart.photo &&
+                            selectedPart.photo.trim() !== ""
+                        ) {
+
+
+                            /*
+                            FOTO ADA DI:
+
+                            static/part/
+                            */
+
+
+                            photo.src =
+                                "/static/part/" +
+                                selectedPart.photo;
+
+
+                            photo.alt =
+                                selectedPart.part_name;
+
+
+                            photo.hidden =
+                                false;
+
+
+                            noPhoto.style.display =
+                                "none";
+
+
+                        }
+
+
+                        /* FOTO TIDAK ADA */
+
+                        else {
+
+
+                            photo.hidden =
+                                true;
+
+
+                            photo.removeAttribute(
+                                "src"
+                            );
+
+
+                            noPhoto.style.display =
+                                "block";
+
+
+                        }
+
+
+                    }
+
+
+                    /* =========================
+                       PART TIDAK DITEMUKAN
+                    ========================= */
+
+                    else {
+
+
+                        if (partNameInput) {
+
+                            partNameInput.value =
+                                "";
+
+                        }
+
+
+                        photo.hidden =
+                            true;
+
+
+                        photo.removeAttribute(
+                            "src"
+                        );
+
+
+                        noPhoto.style.display =
+                            "block";
+
+
+                    }
+
+
+                }
+            );
+
+
+        }
+    );
+
+
+</script>
+
+
+
+<footer class="app-footer">
+    <strong>Crushing App by: Anjar S</strong>
+    <span>NG Material Control · © 2026</span>
+</footer>
+
+</body>
+
+</html>
+```
